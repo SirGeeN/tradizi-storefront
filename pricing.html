@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Plans & Pricing — TRADIZI Business App</title>
+<meta name="description" content="TRADIZI offers Free, Pro, and Business plans. Start free, upgrade when your business grows. Affordable plans for Nigerian businesses."/>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<style>
+:root{--bg:#071018;--card:#101b27;--card2:#132232;--primary:#1E7A4F;--primary2:#2fb16f;--text:#f5f7fa;--muted:#9fb0c0;--border:rgba(255,255,255,0.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+.container{width:min(92%,1200px);margin:auto;}
+a{text-decoration:none;color:inherit;}
+nav{position:fixed;width:100%;top:0;z-index:1000;backdrop-filter:blur(14px);background:rgba(7,16,24,0.78);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:18px 0;}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.15rem;}
+.logo-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),#123d2a);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--muted);transition:0.3s;}
+.nav-links a:hover,.nav-links a.active{color:white;}
+.nav-btn{background:var(--primary);padding:12px 18px;border-radius:12px;color:white!important;font-weight:700;}
+.page-hero{padding:160px 0 80px;text-align:center;}
+.badge{display:inline-flex;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid var(--border);margin-bottom:26px;color:#d5dee7;font-size:0.92rem;}
+.page-hero h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:20px;}
+.page-hero h1 span{color:var(--primary2);}
+.page-hero p{color:var(--muted);font-size:1.1rem;max-width:680px;margin:0 auto;}
+.btn{padding:16px 26px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:0.3s;cursor:pointer;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-primary:hover{background:var(--primary2);}
+.btn-outline{border:1px solid var(--border);background:rgba(255,255,255,0.03);color:white;}
+section{padding:80px 0;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start;}
+.price-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:24px;padding:36px;}
+.price-card.featured{border:1px solid rgba(47,177,111,0.5);position:relative;}
+.featured-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--primary);color:white;font-size:0.8rem;font-weight:700;padding:6px 16px;border-radius:999px;white-space:nowrap;}
+.price-card h3{font-size:1.4rem;margin-bottom:8px;}
+.price-card .tagline{color:var(--muted);font-size:0.95rem;margin-bottom:28px;}
+.price-card .price{font-size:2.2rem;font-weight:900;margin-bottom:4px;}
+.price-card .price span{font-size:1rem;color:var(--muted);font-weight:400;}
+.price-card .price-note{color:var(--muted);font-size:0.85rem;margin-bottom:28px;}
+.price-card ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+.price-card ul li{color:var(--muted);font-size:0.93rem;display:flex;gap:10px;align-items:flex-start;}
+.price-card ul li::before{content:"✓";color:var(--primary2);font-weight:700;flex-shrink:0;margin-top:1px;}
+.price-card ul li.no::before{content:"✕";color:#e55;}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.section-title{text-align:center;margin-bottom:60px;}
+.section-title span{color:var(--primary2);font-weight:700;text-transform:uppercase;font-size:0.9rem;}
+.section-title h2{font-size:clamp(1.8rem,3.5vw,3rem);margin:12px 0 16px;}
+.section-title p{color:var(--muted);max-width:700px;margin:auto;}
+.compare-table{width:100%;border-collapse:collapse;margin-top:40px;}
+.compare-table th,.compare-table td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--border);font-size:0.93rem;}
+.compare-table th{color:var(--primary2);font-weight:700;font-size:0.85rem;text-transform:uppercase;}
+.compare-table td:first-child{color:var(--text);}
+.compare-table td:not(:first-child){color:var(--muted);text-align:center;}
+.compare-table .yes{color:var(--primary2);font-weight:700;}
+.compare-table .no{color:#666;}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02);}
+.cta-box{text-align:center;background:linear-gradient(180deg,#101c28,#0b141d);border-radius:28px;padding:70px 40px;border:1px solid var(--border);}
+.cta-box h2{font-size:clamp(1.8rem,3.5vw,3rem);margin-bottom:16px;}
+.cta-box p{color:var(--muted);max-width:600px;margin:0 auto 32px;}
+.wa-btn{background:#25D366;color:white;padding:16px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:10px;transition:0.3s;}
+.wa-btn:hover{background:#1ebe59;}
+footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--muted);margin-top:80px;}
+footer a{color:var(--muted);margin:0 12px;}
+footer a:hover{color:white;}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr;}}
+@media(max-width:700px){.nav-links{display:none;}.compare-table{font-size:0.82rem;}.compare-table th,.compare-table td{padding:12px 10px;}}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="container nav-inner">
+<a href="index.html" class="logo">
+<div class="logo-icon">🏪</div>
+<span>TRADIZI</span>
+</a>
+<div class="nav-links">
+<a href="features.html">Features</a>
+<a href="pricing.html" class="active">Plans</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="nav-btn">Download App</a>
+</div>
+</div>
+</nav>
+
+<div class="page-hero">
+<div class="container">
+<div class="badge">Simple, Transparent Pricing</div>
+<h1>Start Free.<br/><span>Grow With TRADIZI.</span></h1>
+<p>Every business starts for free. Upgrade when you need more power. No hidden fees, no surprises.</p>
+</div>
+</div>
+
+<section>
+<div class="container">
+<div class="pricing-grid">
+
+<div class="price-card">
+<h3>Free</h3>
+<p class="tagline">Perfect for businesses getting started.</p>
+<div class="price">₦0 <span>forever</span></div>
+<p class="price-note">No credit card required</p>
+<ul>
+<li>Sales tracking &amp; receipts</li>
+<li>Inventory management</li>
+<li>Credit book</li>
+<li>Daily business summary</li>
+<li>WhatsApp receipts (limited)</li>
+<li>Cloud backup</li>
+<li class="no">Advanced reports &amp; analytics</li>
+<li class="no">Profit tracking</li>
+<li class="no">Full sales history</li>
+<li class="no">Staff management</li>
+</ul>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-outline" style="width:100%;justify-content:center;">Get Started Free</a>
+</div>
+
+<div class="price-card featured">
+<div class="featured-badge">Most Popular</div>
+<h3>Pro</h3>
+<p class="tagline">Advanced tools for growing businesses.</p>
+<div class="price">Contact Us <span></span></div>
+<p class="price-note">WhatsApp us for current pricing</p>
+<ul>
+<li>Everything in Free</li>
+<li>Unlimited products &amp; customers</li>
+<li>Full sales history (365 days)</li>
+<li>Advanced analytics &amp; reports</li>
+<li>Profit &amp; cost tracking</li>
+<li>Unbranded WhatsApp receipts</li>
+<li>Unbranded PDF reports</li>
+<li>Custom date range reports</li>
+<li>Priority support</li>
+<li class="no">Multi-device sync</li>
+</ul>
+<a href="https://wa.me/2348038933023?text=Hi%2C%20I%20want%20to%20upgrade%20to%20TRADIZI%20Pro" class="btn btn-primary" style="width:100%;justify-content:center;">Get Pro</a>
+</div>
+
+<div class="price-card">
+<h3>Business</h3>
+<p class="tagline">For teams and multi-device operations.</p>
+<div class="price">Contact Us <span></span></div>
+<p class="price-note">WhatsApp us for current pricing</p>
+<ul>
+<li>Everything in Pro</li>
+<li>Multi-staff with PIN login</li>
+<li>Manager &amp; Seller roles</li>
+<li>Staff price &amp; cost permissions</li>
+<li>Multi-device sync</li>
+<li>Full daily report details</li>
+<li>Unlimited sales history</li>
+<li>Debt reminders automation</li>
+<li>WhatsApp storefront sharing</li>
+<li>Dedicated business support</li>
+</ul>
+<a href="https://wa.me/2348038933023?text=Hi%2C%20I%20want%20to%20upgrade%20to%20TRADIZI%20Business" class="btn btn-outline" style="width:100%;justify-content:center;">Get Business</a>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Comparison Table -->
+<section>
+<div class="container">
+<div class="section-title">
+<span>Full Comparison</span>
+<h2>What's Included in Each Plan</h2>
+</div>
+<table class="compare-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Free</th>
+<th>Pro</th>
+<th>Business</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Sales tracking</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Inventory management</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Credit book</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>WhatsApp receipts</td><td>Limited</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+<tr><td>PDF reports</td><td>With watermark</td><td class="yes">Unbranded</td><td class="yes">Unbranded</td></tr>
+<tr><td>Sales history</td><td>90 days</td><td>365 days</td><td class="yes">Unlimited</td></tr>
+<tr><td>Products</td><td>Up to 30</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+<tr><td>Customers</td><td>Up to 30</td><td>Up to 500</td><td class="yes">Unlimited</td></tr>
+<tr><td>Advanced reports &amp; analytics</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Profit &amp; cost tracking</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Custom date range reports</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Daily report full details</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+<tr><td>Staff management</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+<tr><td>Multi-device sync</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+<tr><td>Debt reminders automation</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- CTA -->
+<section>
+<div class="container">
+<div class="cta-box">
+<h2>Questions About Pricing?</h2>
+<p>Chat with us on WhatsApp — we'll help you choose the right plan for your business and get you set up.</p>
+<a href="https://wa.me/2348038933023?text=Hi%2C%20I%20have%20a%20question%20about%20TRADIZI%20pricing" class="wa-btn">💬 Chat on WhatsApp</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<p>© 2026 TRADIZI — ZimTrix Technologies LTD &nbsp;|&nbsp;
+<a href="/">Home</a>
+<a href="features.html">Features</a>
+<a href="pricing.html">Plans</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</p>
+</div>
+</footer>
+
+</body>
+</html>

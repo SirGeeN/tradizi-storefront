@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Features — TRADIZI Business App</title>
+<meta name="description" content="Explore all TRADIZI features — sales management, inventory tracking, credit book, advanced reports, staff control, WhatsApp receipts, and offline-first sync."/>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<style>
+:root{--bg:#071018;--card:#101b27;--card2:#132232;--primary:#1E7A4F;--primary2:#2fb16f;--text:#f5f7fa;--muted:#9fb0c0;--border:rgba(255,255,255,0.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+.container{width:min(92%,1200px);margin:auto;}
+a{text-decoration:none;color:inherit;}
+nav{position:fixed;width:100%;top:0;z-index:1000;backdrop-filter:blur(14px);background:rgba(7,16,24,0.78);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:18px 0;}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.15rem;}
+.logo-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),#123d2a);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--muted);transition:0.3s;}
+.nav-links a:hover{color:white;}
+.nav-links a.active{color:white;}
+.nav-btn{background:var(--primary);padding:12px 18px;border-radius:12px;color:white!important;font-weight:700;}
+.page-hero{padding:160px 0 80px;text-align:center;}
+.badge{display:inline-flex;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid var(--border);margin-bottom:26px;color:#d5dee7;font-size:0.92rem;}
+.page-hero h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:20px;}
+.page-hero h1 span{color:var(--primary2);}
+.page-hero p{color:var(--muted);font-size:1.1rem;max-width:680px;margin:0 auto 40px;}
+.btn{padding:16px 26px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:0.3s;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-primary:hover{background:var(--primary2);}
+section{padding:80px 0;}
+.section-title{text-align:center;margin-bottom:60px;}
+.section-title span{color:var(--primary2);font-weight:700;text-transform:uppercase;font-size:0.9rem;}
+.section-title h2{font-size:clamp(1.8rem,3.5vw,3rem);margin:12px 0 16px;}
+.section-title p{color:var(--muted);max-width:700px;margin:auto;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.feature-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:24px;padding:32px;}
+.feature-icon{width:64px;height:64px;border-radius:18px;background:rgba(47,177,111,0.14);display:grid;place-items:center;font-size:28px;margin-bottom:24px;}
+.feature-card h3{margin-bottom:14px;font-size:1.15rem;}
+.feature-card p{color:var(--muted);font-size:0.95rem;}
+.feature-card ul{margin-top:16px;list-style:none;display:flex;flex-direction:column;gap:10px;}
+.feature-card ul li{color:var(--muted);font-size:0.9rem;display:flex;gap:8px;}
+.feature-card ul li::before{content:"✓";color:var(--primary2);font-weight:700;flex-shrink:0;}
+.highlight-row{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:60px 0;}
+.highlight-row.reverse{direction:rtl;}
+.highlight-row.reverse>*{direction:ltr;}
+.highlight-text span{color:var(--primary2);font-weight:700;text-transform:uppercase;font-size:0.9rem;display:block;margin-bottom:12px;}
+.highlight-text h2{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-1px;margin-bottom:16px;}
+.highlight-text p{color:var(--muted);margin-bottom:20px;}
+.highlight-list{display:flex;flex-direction:column;gap:12px;margin-top:20px;}
+.highlight-list div{color:var(--muted);font-size:0.95rem;}
+.highlight-img{background:var(--card);border:1px solid var(--border);border-radius:28px;overflow:hidden;min-height:320px;}
+.highlight-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.cta-box{text-align:center;background:linear-gradient(180deg,#101c28,#0b141d);border-radius:28px;padding:70px 40px;border:1px solid var(--border);}
+.cta-box h2{font-size:clamp(1.8rem,3.5vw,3rem);margin-bottom:16px;}
+.cta-box p{color:var(--muted);max-width:600px;margin:0 auto 32px;}
+footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--muted);margin-top:80px;}
+footer a{color:var(--muted);margin:0 12px;}
+footer a:hover{color:white;}
+@media(max-width:980px){.features-grid{grid-template-columns:1fr 1fr;}.highlight-row{grid-template-columns:1fr;}.highlight-row.reverse{direction:ltr;}}
+@media(max-width:700px){.nav-links{display:none;}.features-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="container nav-inner">
+<a href="index.html" class="logo">
+<div class="logo-icon">🏪</div>
+<span>TRADIZI</span>
+</a>
+<div class="nav-links">
+<a href="features.html" class="active">Features</a>
+<a href="pricing.html">Plans</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="nav-btn">Download App</a>
+</div>
+</div>
+</nav>
+
+<div class="page-hero">
+<div class="container">
+<div class="badge">Everything Your Business Needs</div>
+<h1>Powerful Features.<br/><span>Simple to Use.</span></h1>
+<p>TRADIZI brings together sales, inventory, credit, reports, staff management, and cloud sync — all in one offline-first Android app built for modern businesses.</p>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">Download Free on Google Play</a>
+</div>
+</div>
+
+<!-- Core Features Grid -->
+<section>
+<div class="container">
+<div class="section-title">
+<span>Core Features</span>
+<h2>Six Pillars of Your Business</h2>
+<p>Every feature was designed from real business needs — not assumptions.</p>
+</div>
+<div class="features-grid">
+
+<div class="feature-card">
+<div class="feature-icon">🛒</div>
+<h3>Sales Management</h3>
+<p>Record every transaction in seconds with a fast tap-to-sell product grid.</p>
+<ul>
+<li>Cash, Transfer, POS, and Credit payments</li>
+<li>Branded WhatsApp and PDF receipts</li>
+<li>Bulk product unit picker (Cup, Bag, Derica)</li>
+<li>Multiple product variants per item</li>
+<li>Sale history with full item breakdown</li>
+</ul>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">📦</div>
+<h3>Inventory Management</h3>
+<p>Stay on top of your stock at all times — from single units to bulk packaging.</p>
+<ul>
+<li>Bulk product tracking (Bag → Cup conversion)</li>
+<li>Fixed packaging (Crate, Carton, Bottle)</li>
+<li>Low stock and out-of-stock alerts</li>
+<li>Restock logging with price history</li>
+<li>Stock value and retail value tracking</li>
+</ul>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">📋</div>
+<h3>Credit Book</h3>
+<p>Track every debt, payment, and overdue balance without a notebook.</p>
+<ul>
+<li>Customer debt entries with due dates</li>
+<li>Partial and full payment recording</li>
+<li>Overdue debt alerts on dashboard</li>
+<li>WhatsApp debt reminders with one tap</li>
+<li>Full payment receipt sharing</li>
+</ul>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">📊</div>
+<h3>Advanced Reports</h3>
+<p>Business intelligence built for daily decisions — not accountants.</p>
+<ul>
+<li>Sales revenue and profit tracking</li>
+<li>Payment method breakdown</li>
+<li>Top products and fast/slow movers</li>
+<li>7-day and custom date range filters</li>
+<li>PDF and WhatsApp export</li>
+</ul>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">👥</div>
+<h3>Staff Management</h3>
+<p>Run your team with confidence — control who sees what and who does what.</p>
+<ul>
+<li>Manager and Seller roles with PIN login</li>
+<li>Control price editing permissions</li>
+<li>Control cost and profit visibility</li>
+<li>PIN reset for staff remotely</li>
+<li>Remove staff access instantly</li>
+</ul>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">🔔</div>
+<h3>Smart Automation</h3>
+<p>Let TRADIZI do the routine work so you can focus on your business.</p>
+<ul>
+<li>Daily business summary notification</li>
+<li>Debt due date reminders</li>
+<li>Automatic cloud backup on login</li>
+<li>WhatsApp storefront sharing</li>
+<li>Customer auto-creation from sales</li>
+</ul>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Sales Deep Dive -->
+<section style="background:linear-gradient(180deg,#0c1722,#09131c);">
+<div class="container">
+<div class="highlight-row">
+<div class="highlight-text">
+<span>Sales Tab</span>
+<h2>Sell Faster With the Smart Product Grid</h2>
+<p>The TRADIZI sales screen puts your most frequently sold products at the top automatically. Tap to add to cart — no typing, no searching.</p>
+<div class="highlight-list">
+<div>⚡ Products ranked by how often and recently you sell them</div>
+<div>🧠 Unit memory — remembers how you sell each product</div>
+<div>🏷️ Price always pulled from inventory — always accurate</div>
+<div>📦 Bulk unit picker for rice, beans, palm oil, and more</div>
+<div>💳 Sell new ad-hoc items without leaving the screen</div>
+</div>
+</div>
+<div class="highlight-img">
+<img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80" alt="Sales management"/>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Inventory Deep Dive -->
+<section>
+<div class="container">
+<div class="highlight-row reverse">
+<div class="highlight-text">
+<span>Inventory Tab</span>
+<h2>Full Stock Control From Unit to Package</h2>
+<p>TRADIZI handles the complexity of bulk products, fixed packaging, and unit conversions automatically — so your stock counts are always right.</p>
+<div class="highlight-list">
+<div>📦 Bulk products stored in base units (cups) internally</div>
+<div>🔄 Restocking adds to existing stock with price update option</div>
+<div>📉 Stock deducted automatically when a sale is recorded</div>
+<div>📊 Inventory value calculated at buying price</div>
+<div>🏷️ Category grouping for organised browsing</div>
+</div>
+</div>
+<div class="highlight-img">
+<img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?auto=format&fit=crop&w=1200&q=80" alt="Inventory management"/>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Offline + Sync -->
+<section style="background:linear-gradient(180deg,#0c1722,#09131c);">
+<div class="container">
+<div class="highlight-row">
+<div class="highlight-text">
+<span>Cloud Sync</span>
+<h2>Works Offline. Backs Up Automatically.</h2>
+<p>TRADIZI stores everything locally on your device first. When you connect to the internet, changes sync to the cloud automatically — no manual saving required.</p>
+<div class="highlight-list">
+<div>✅ All data stored locally in SQLite — works without internet</div>
+<div>☁️ Automatic delta sync to Supabase cloud on login</div>
+<div>📱 Access your business from multiple devices</div>
+<div>🔒 Your data is encrypted and private</div>
+<div>⚡ Only changed records are synced — fast and efficient</div>
+</div>
+</div>
+<div class="highlight-img">
+<img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=80" alt="Cloud sync"/>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CTA -->
+<section>
+<div class="container">
+<div class="cta-box">
+<h2>Ready to Take Control of Your Business?</h2>
+<p>Download TRADIZI free on Google Play and start managing your business the smart way today.</p>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">Download Free on Google Play</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<p>© 2026 TRADIZI — ZimTrix Technologies LTD &nbsp;|&nbsp;
+<a href="/">Home</a>
+<a href="features.html">Features</a>
+<a href="pricing.html">Plans</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</p>
+</div>
+</footer>
+
+</body>
+</html>

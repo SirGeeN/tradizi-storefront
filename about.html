@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>About — TRADIZI by ZimTrix Technologies</title>
+<meta name="description" content="TRADIZI is built by ZimTrix Technologies LTD in Lagos, Nigeria. Our mission is to give every business owner the tools to run a smarter, more organised business."/>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<style>
+:root{--bg:#071018;--card:#101b27;--card2:#132232;--primary:#1E7A4F;--primary2:#2fb16f;--text:#f5f7fa;--muted:#9fb0c0;--border:rgba(255,255,255,0.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+.container{width:min(92%,1200px);margin:auto;}
+a{text-decoration:none;color:inherit;}
+nav{position:fixed;width:100%;top:0;z-index:1000;backdrop-filter:blur(14px);background:rgba(7,16,24,0.78);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:18px 0;}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.15rem;}
+.logo-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),#123d2a);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--muted);transition:0.3s;}
+.nav-links a:hover,.nav-links a.active{color:white;}
+.nav-btn{background:var(--primary);padding:12px 18px;border-radius:12px;color:white!important;font-weight:700;}
+.page-hero{padding:160px 0 80px;text-align:center;}
+.badge{display:inline-flex;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid var(--border);margin-bottom:26px;color:#d5dee7;font-size:0.92rem;}
+.page-hero h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:20px;}
+.page-hero h1 span{color:var(--primary2);}
+.page-hero p{color:var(--muted);font-size:1.1rem;max-width:700px;margin:0 auto;}
+.btn{padding:16px 26px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:0.3s;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-primary:hover{background:var(--primary2);}
+section{padding:80px 0;}
+.section-title{text-align:center;margin-bottom:60px;}
+.section-title span{color:var(--primary2);font-weight:700;text-transform:uppercase;font-size:0.9rem;}
+.section-title h2{font-size:clamp(1.8rem,3.5vw,3rem);margin:12px 0 16px;}
+.section-title p{color:var(--muted);max-width:700px;margin:auto;}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.mission-text span{color:var(--primary2);font-weight:700;text-transform:uppercase;font-size:0.9rem;display:block;margin-bottom:12px;}
+.mission-text h2{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-1px;margin-bottom:20px;}
+.mission-text p{color:var(--muted);margin-bottom:16px;font-size:1rem;}
+.mission-img{background:var(--card);border:1px solid var(--border);border-radius:28px;overflow:hidden;min-height:360px;}
+.mission-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.value-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:24px;padding:32px;}
+.value-icon{font-size:36px;margin-bottom:16px;}
+.value-card h3{margin-bottom:12px;font-size:1.1rem;}
+.value-card p{color:var(--muted);font-size:0.93rem;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:60px;}
+.stat-box{text-align:center;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:20px;padding:32px 20px;}
+.stat-box .num{font-size:2.8rem;font-weight:900;color:var(--primary2);line-height:1;}
+.stat-box .lbl{color:var(--muted);font-size:0.9rem;margin-top:8px;}
+.story-block{max-width:820px;margin:0 auto;}
+.story-block p{color:var(--muted);font-size:1.05rem;margin-bottom:20px;line-height:1.8;}
+.story-block p strong{color:var(--text);}
+.cta-box{text-align:center;background:linear-gradient(180deg,#101c28,#0b141d);border-radius:28px;padding:70px 40px;border:1px solid var(--border);}
+.cta-box h2{font-size:clamp(1.8rem,3.5vw,3rem);margin-bottom:16px;}
+.cta-box p{color:var(--muted);max-width:600px;margin:0 auto 32px;}
+footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--muted);margin-top:80px;}
+footer a{color:var(--muted);margin:0 12px;}
+footer a:hover{color:white;}
+@media(max-width:900px){.mission-grid{grid-template-columns:1fr;}.values-grid{grid-template-columns:1fr 1fr;}.stats-row{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.nav-links{display:none;}.values-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="container nav-inner">
+<a href="index.html" class="logo">
+<div class="logo-icon">🏪</div>
+<span>TRADIZI</span>
+</a>
+<div class="nav-links">
+<a href="features.html">Features</a>
+<a href="pricing.html">Plans</a>
+<a href="about.html" class="active">About</a>
+<a href="contact.html">Contact</a>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="nav-btn">Download App</a>
+</div>
+</div>
+</nav>
+
+<div class="page-hero">
+<div class="container">
+<div class="badge">ZimTrix Technologies LTD — Lagos, Nigeria</div>
+<h1>Built in Nigeria.<br/><span>Built for Business.</span></h1>
+<p>TRADIZI was created to give every business owner — from market traders to growing enterprises — the modern tools they deserve to run a smarter, more organised business.</p>
+</div>
+</div>
+
+<!-- Mission -->
+<section>
+<div class="container">
+<div class="mission-grid">
+<div class="mission-text">
+<span>Our Mission</span>
+<h2>Replacing Notebooks With Smart Business Infrastructure</h2>
+<p>Millions of businesses in Nigeria run their operations on notebooks, memory, and scattered WhatsApp messages. Important data gets lost. Debts go untracked. Stock runs out unexpectedly. Profits are unknown.</p>
+<p>TRADIZI was built to change that. We believe every business — no matter how big or small — deserves a reliable, intelligent system to manage their daily operations with confidence.</p>
+<p>Our goal is simple: make business management so easy that any owner can master it in minutes, and so powerful that it scales with them as they grow.</p>
+</div>
+<div class="mission-img">
+<img src="https://images.unsplash.com/photo-1573497019418-b400bb3ab074?auto=format&fit=crop&w=1200&q=80" alt="Business owner using TRADIZI"/>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Our Story -->
+<section style="background:linear-gradient(180deg,#0c1722,#09131c);">
+<div class="container">
+<div class="section-title">
+<span>Our Story</span>
+<h2>Why We Built TRADIZI</h2>
+</div>
+<div class="story-block">
+<p>TRADIZI started with a simple observation: <strong>business owners in Nigeria are among the hardest working people in the world</strong> — yet they were managing their businesses with tools that hadn't changed in decades.</p>
+<p>A trader selling rice and beans in Lagos kept her stock in a notebook. A phone accessories shop owner in Abuja tracked debts in his head. A cosmetics business owner relied on WhatsApp voice messages to remember daily sales. When things went wrong — and they always did — there was no system to fall back on.</p>
+<p>We built TRADIZI to be <strong>the operating system for Nigerian commerce</strong>. Offline-first because electricity and internet are unreliable. Simple because business owners don't have time for complex software. Powerful because growing businesses need real intelligence — not just a digital notebook.</p>
+<p>Every feature in TRADIZI was shaped by real conversations with real business owners. The bulk product tracking, the tap-to-sell grid, the WhatsApp receipt sharing, the daily summary notification — all of it came from watching how businesses actually work, and building exactly what they need.</p>
+</div>
+</div>
+</section>
+
+<!-- Values -->
+<section>
+<div class="container">
+<div class="section-title">
+<span>What We Stand For</span>
+<h2>Our Core Values</h2>
+</div>
+<div class="values-grid">
+<div class="value-card">
+<div class="value-icon">🏗️</div>
+<h3>Offline First</h3>
+<p>Your business cannot stop because of internet issues. TRADIZI stores everything locally and syncs when you're online — always reliable, always available.</p>
+</div>
+<div class="value-card">
+<div class="value-icon">🎯</div>
+<h3>Built for Real Use</h3>
+<p>Every feature was designed around how Nigerian business owners actually work — not how software engineers think they should work.</p>
+</div>
+<div class="value-card">
+<div class="value-icon">🔒</div>
+<h3>Data Security</h3>
+<p>Your business data is yours. We use encrypted cloud storage, PIN-based access, and role permissions to keep your information safe and private.</p>
+</div>
+<div class="value-card">
+<div class="value-icon">📈</div>
+<h3>Growth Focused</h3>
+<p>TRADIZI scales with your business — from a single owner to a team with multiple staff, devices, and locations.</p>
+</div>
+<div class="value-card">
+<div class="value-icon">💚</div>
+<h3>Accessible Pricing</h3>
+<p>We start businesses for free and keep our paid plans affordable. Every business in Nigeria deserves access to professional tools.</p>
+</div>
+<div class="value-card">
+<div class="value-icon">🤝</div>
+<h3>Genuine Support</h3>
+<p>Real human support via WhatsApp — not bots, not email queues. We're Nigerian builders who understand your business context.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Stats -->
+<section style="background:linear-gradient(180deg,#0c1722,#09131c);">
+<div class="container">
+<div class="section-title">
+<span>TRADIZI By The Numbers</span>
+<h2>Built With Purpose</h2>
+</div>
+<div class="stats-row">
+<div class="stat-box">
+<div class="num">6</div>
+<div class="lbl">Core Feature Modules</div>
+</div>
+<div class="stat-box">
+<div class="num">3</div>
+<div class="lbl">User Roles Supported</div>
+</div>
+<div class="stat-box">
+<div class="num">100%</div>
+<div class="lbl">Offline First</div>
+</div>
+<div class="stat-box">
+<div class="num">🇳🇬</div>
+<div class="lbl">Made in Nigeria</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CTA -->
+<section>
+<div class="container">
+<div class="cta-box">
+<h2>Join the TRADIZI Movement</h2>
+<p>Download TRADIZI free and take the first step towards running a smarter, more organised business.</p>
+<a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">Download Free on Google Play</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<p>© 2026 TRADIZI — ZimTrix Technologies LTD &nbsp;|&nbsp;
+<a href="/">Home</a>
+<a href="features.html">Features</a>
+<a href="pricing.html">Plans</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</p>
+</div>
+</footer>
+
+</body>
+</html>
