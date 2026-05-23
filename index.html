@@ -1,911 +1,789 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TRADIZI — Business App for Nigerian Traders</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <style>
-    :root{
-      --bg:#0b1118;
-      --card:#111827;
-      --soft:#161f2b;
-      --primary:#1E7A4F;
-      --primary-light:#2da86d;
-      --text:#f5f7fa;
-      --muted:#9aa4b2;
-      --border:rgba(255,255,255,0.08);
-      --shadow:0 20px 60px rgba(0,0,0,0.45);
-      --radius:22px;
-      --max:1200px;
-    }
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x:hidden;
-      line-height:1.6;
-    }
-
-    img{
-      width:100%;
-      display:block;
-    }
-
-    a{
-      text-decoration:none;
-      color:inherit;
-    }
-
-    .container{
-      width:min(92%, var(--max));
-      margin:auto;
-    }
-
-    /* NAVBAR */
-
-    nav{
-      position:fixed;
-      top:0;
-      width:100%;
-      z-index:1000;
-      backdrop-filter:blur(14px);
-      background:rgba(11,17,24,0.72);
-      border-bottom:1px solid var(--border);
-    }
-
-    .nav-inner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:18px 0;
-    }
-
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:800;
-      font-size:1.1rem;
-      letter-spacing:0.5px;
-    }
-
-    .logo-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg,var(--primary),#123d2a);
-      font-size:20px;
-      box-shadow:0 10px 25px rgba(30,122,79,0.35);
-    }
-
-    .nav-links{
-      display:flex;
-      gap:28px;
-      align-items:center;
-    }
-
-    .nav-links a{
-      color:var(--muted);
-      font-size:0.95rem;
-      transition:0.3s ease;
-    }
-
-    .nav-links a:hover{
-      color:#fff;
-    }
-
-    .nav-btn{
-      background:var(--primary);
-      padding:12px 18px;
-      border-radius:12px;
-      color:#fff !important;
-      font-weight:700;
-    }
-
-    .nav-btn:hover{
-      background:var(--primary-light);
-    }
-
-    /* HERO */
-
-    .hero{
-      position:relative;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      padding:120px 0 80px;
-      overflow:hidden;
-    }
-
-    .hero::before{
-      content:"";
-      position:absolute;
-      width:500px;
-      height:500px;
-      background:rgba(30,122,79,0.18);
-      filter:blur(120px);
-      top:-120px;
-      right:-100px;
-      border-radius:50%;
-    }
-
-    .hero::after{
-      content:"";
-      position:absolute;
-      width:420px;
-      height:420px;
-      background:rgba(255,255,255,0.04);
-      filter:blur(100px);
-      bottom:-100px;
-      left:-100px;
-      border-radius:50%;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.1fr 1fr;
-      gap:60px;
-      align-items:center;
-      position:relative;
-      z-index:2;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      background:rgba(255,255,255,0.05);
-      border:1px solid var(--border);
-      padding:10px 16px;
-      border-radius:999px;
-      color:#cbd5e1;
-      margin-bottom:24px;
-      font-size:0.92rem;
-    }
-
-    .hero h1{
-      font-size:clamp(3rem,6vw,5.6rem);
-      line-height:1;
-      margin-bottom:22px;
-      font-weight:900;
-      letter-spacing:-2px;
-    }
-
-    .hero h1 span{
-      color:var(--primary-light);
-    }
-
-    .hero p{
-      color:var(--muted);
-      font-size:1.12rem;
-      max-width:620px;
-      margin-bottom:34px;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
-      margin-bottom:36px;
-    }
-
-    .btn{
-      padding:16px 26px;
-      border-radius:14px;
-      font-weight:700;
-      transition:0.3s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-    }
-
-    .btn-primary{
-      background:var(--primary);
-      color:#fff;
-      box-shadow:0 15px 35px rgba(30,122,79,0.35);
-    }
-
-    .btn-primary:hover{
-      transform:translateY(-2px);
-      background:var(--primary-light);
-    }
-
-    .btn-secondary{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,0.03);
-      color:#fff;
-    }
-
-    .btn-secondary:hover{
-      background:rgba(255,255,255,0.08);
-    }
-
-    .stats{
-      display:flex;
-      gap:30px;
-      flex-wrap:wrap;
-    }
-
-    .stat h3{
-      font-size:1.8rem;
-      margin-bottom:4px;
-    }
-
-    .stat p{
-      margin:0;
-      font-size:0.95rem;
-    }
-
-    .hero-card{
-      background:linear-gradient(180deg,#17212f,#111827);
-      border:1px solid var(--border);
-      border-radius:30px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .hero-card img{
-      height:100%;
-      object-fit:cover;
-    }
-
-    /* SECTION */
-
-    section{
-      padding:100px 0;
-    }
-
-    .section-title{
-      text-align:center;
-      margin-bottom:60px;
-    }
-
-    .section-title span{
-      color:var(--primary-light);
-      font-weight:700;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      font-size:0.9rem;
-    }
-
-    .section-title h2{
-      font-size:clamp(2rem,4vw,3.5rem);
-      margin-top:12px;
-      margin-bottom:18px;
-    }
-
-    .section-title p{
-      color:var(--muted);
-      max-width:700px;
-      margin:auto;
-    }
-
-    /* FEATURES */
-
-    .features-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:24px;
-    }
-
-    .feature-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      padding:32px;
-      border-radius:24px;
-      transition:0.35s ease;
-    }
-
-    .feature-card:hover{
-      transform:translateY(-8px);
-      border-color:rgba(45,168,109,0.35);
-    }
-
-    .feature-icon{
-      width:64px;
-      height:64px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      background:rgba(30,122,79,0.15);
-      margin-bottom:24px;
-      font-size:28px;
-    }
-
-    .feature-card h3{
-      margin-bottom:14px;
-      font-size:1.3rem;
-    }
-
-    .feature-card p{
-      color:var(--muted);
-    }
-
-    /* GALLERY */
-
-    .gallery-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:20px;
-    }
-
-    .gallery-card{
-      position:relative;
-      overflow:hidden;
-      border-radius:24px;
-      min-height:340px;
-      border:1px solid var(--border);
-    }
-
-    .gallery-card img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transition:0.5s ease;
-    }
-
-    .gallery-card:hover img{
-      transform:scale(1.08);
-    }
-
-    .gallery-overlay{
-      position:absolute;
-      inset:0;
-      background:linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-      display:flex;
-      align-items:flex-end;
-      padding:28px;
-    }
-
-    .gallery-overlay h3{
-      font-size:1.3rem;
-      margin-bottom:6px;
-    }
-
-    .gallery-overlay p{
-      color:#d1d5db;
-      font-size:0.95rem;
-    }
-
-    /* TESTIMONIAL */
-
-    .testimonial{
-      margin-top:30px;
-      background:linear-gradient(180deg,#131d29,#101722);
-      border:1px solid var(--border);
-      border-radius:28px;
-      padding:40px;
-      text-align:center;
-    }
-
-    .testimonial p{
-      font-size:1.15rem;
-      color:#dbe4ee;
-      max-width:850px;
-      margin:auto;
-    }
-
-    .testimonial-author{
-      margin-top:24px;
-      color:var(--muted);
-    }
-
-    /* CONTACT */
-
-    .contact-wrapper{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:32px;
-    }
-
-    .contact-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:26px;
-      padding:36px;
-    }
-
-    .contact-card h3{
-      margin-bottom:20px;
-      font-size:1.6rem;
-    }
-
-    .contact-info{
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .contact-item{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-    }
-
-    .contact-item span{
-      font-size:1.3rem;
-    }
-
-    .contact-item p{
-      color:var(--muted);
-    }
-
-    form{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-    }
-
-    input,
-    textarea{
-      width:100%;
-      border:none;
-      outline:none;
-      padding:16px;
-      border-radius:14px;
-      background:var(--soft);
-      color:#fff;
-      border:1px solid transparent;
-      transition:0.25s ease;
-      font-size:1rem;
-    }
-
-    input:focus,
-    textarea:focus{
-      border-color:rgba(45,168,109,0.5);
-    }
-
-    textarea{
-      min-height:140px;
-      resize:vertical;
-    }
-
-    button{
-      border:none;
-      cursor:pointer;
-    }
-
-    footer{
-      border-top:1px solid var(--border);
-      padding:28px 0;
-      text-align:center;
-      color:var(--muted);
-      font-size:0.95rem;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 980px){
-
-      .hero-grid,
-      .contact-wrapper{
-        grid-template-columns:1fr;
-      }
-
-      .features-grid,
-      .gallery-grid{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .hero{
-        padding-top:140px;
-      }
-
-      .hero-card{
-        max-width:620px;
-        margin:auto;
-      }
-    }
-
-    @media (max-width: 700px){
-
-      .nav-links{
-        display:none;
-      }
-
-      .hero h1{
-        font-size:3rem;
-      }
-
-      .features-grid,
-      .gallery-grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero-actions{
-        flex-direction:column;
-      }
-
-      .btn{
-        width:100%;
-      }
-
-      .stats{
-        gap:20px;
-      }
-
-      .contact-card{
-        padding:28px;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TRADIZI — The Smart Business Operating System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<style>
+:root{
+  --bg:#071018;
+  --card:#101b27;
+  --card2:#132232;
+  --primary:#1E7A4F;
+  --primary2:#2fb16f;
+  --text:#f5f7fa;
+  --muted:#9fb0c0;
+  --border:rgba(255,255,255,0.08);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+.container{
+  width:min(92%,1200px);
+  margin:auto;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+img{
+  width:100%;
+  display:block;
+}
+
+nav{
+  position:fixed;
+  width:100%;
+  top:0;
+  z-index:1000;
+  backdrop-filter:blur(14px);
+  background:rgba(7,16,24,0.75);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-inner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 0;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:800;
+  font-size:1.15rem;
+}
+
+.logo-icon{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--primary),#123d2a);
+}
+
+.nav-links{
+  display:flex;
+  gap:28px;
+  align-items:center;
+}
+
+.nav-links a{
+  color:var(--muted);
+  transition:0.3s;
+}
+
+.nav-links a:hover{
+  color:white;
+}
+
+.nav-btn{
+  background:var(--primary);
+  padding:12px 18px;
+  border-radius:12px;
+  color:white !important;
+  font-weight:700;
+}
+
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  padding:140px 0 80px;
+  position:relative;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:600px;
+  height:600px;
+  background:rgba(47,177,111,0.12);
+  filter:blur(120px);
+  top:-100px;
+  right:-100px;
+  border-radius:50%;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:60px;
+  align-items:center;
+}
+
+.badge{
+  display:inline-flex;
+  padding:10px 16px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  margin-bottom:26px;
+  color:#d5dee7;
+  font-size:0.92rem;
+}
+
+.hero h1{
+  font-size:clamp(3rem,6vw,5.5rem);
+  line-height:0.95;
+  margin-bottom:24px;
+  font-weight:900;
+  letter-spacing:-2px;
+}
+
+.hero h1 span{
+  color:var(--primary2);
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:1.1rem;
+  margin-bottom:34px;
+  max-width:620px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:16px 26px;
+  border-radius:14px;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:white;
+}
+
+.btn-primary:hover{
+  background:var(--primary2);
+  transform:translateY(-2px);
+}
+
+.btn-secondary{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.03);
+}
+
+.hero-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+.hero-card img{
+  height:100%;
+  object-fit:cover;
+}
+
+.stats{
+  display:flex;
+  gap:30px;
+  margin-top:42px;
+  flex-wrap:wrap;
+}
+
+.stat h3{
+  font-size:1.9rem;
+}
+
+.stat p{
+  margin:0;
+  font-size:0.95rem;
+}
+
+section{
+  padding:100px 0;
+}
+
+.section-title{
+  text-align:center;
+  margin-bottom:60px;
+}
+
+.section-title span{
+  color:var(--primary2);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:0.9rem;
+}
+
+.section-title h2{
+  font-size:clamp(2rem,4vw,3.4rem);
+  margin:12px 0 16px;
+}
+
+.section-title p{
+  color:var(--muted);
+  max-width:760px;
+  margin:auto;
+}
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+
+.feature-card{
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:32px;
+  transition:0.3s;
+}
+
+.feature-card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(47,177,111,0.4);
+}
+
+.feature-icon{
+  width:64px;
+  height:64px;
+  border-radius:18px;
+  background:rgba(47,177,111,0.14);
+  display:grid;
+  place-items:center;
+  font-size:28px;
+  margin-bottom:24px;
+}
+
+.feature-card h3{
+  margin-bottom:14px;
+  font-size:1.35rem;
+}
+
+.feature-card p{
+  color:var(--muted);
+}
+
+.highlight{
+  background:linear-gradient(180deg,#0c1722,#09131c);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.highlight-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:60px;
+  align-items:center;
+}
+
+.highlight-list{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:28px;
+}
+
+.highlight-item{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+}
+
+.gallery-card{
+  position:relative;
+  min-height:340px;
+  border-radius:24px;
+  overflow:hidden;
+}
+
+.gallery-card img{
+  height:100%;
+  object-fit:cover;
+}
+
+.gallery-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);
+  display:flex;
+  align-items:flex-end;
+  padding:28px;
+}
+
+.pricing{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+
+.price-card{
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:36px;
+}
+
+.price-card.featured{
+  border:1px solid rgba(47,177,111,0.5);
+  transform:scale(1.03);
+}
+
+.price-card h3{
+  font-size:1.5rem;
+  margin-bottom:10px;
+}
+
+.price-card ul{
+  margin-top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  color:var(--muted);
+  list-style:none;
+}
+
+.contact{
+  text-align:center;
+  background:linear-gradient(180deg,#101c28,#0b141d);
+  border-radius:28px;
+  padding:70px 40px;
+  border:1px solid var(--border);
+}
+
+footer{
+  padding:28px 0;
+  text-align:center;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  margin-top:80px;
+}
+
+@media(max-width:980px){
+
+  .hero-grid,
+  .highlight-grid,
+  .pricing{
+    grid-template-columns:1fr;
+  }
+
+  .features-grid,
+  .gallery-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:700px){
+
+  .nav-links{
+    display:none;
+  }
+
+  .features-grid,
+  .gallery-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero-actions{
+    flex-direction:column;
+  }
+
+  .btn{
+    width:100%;
+  }
+
+  .hero{
+    padding-top:120px;
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <!-- NAVIGATION -->
+<nav>
+  <div class="container nav-inner">
 
-  <nav>
-    <div class="container nav-inner">
+    <div class="logo">
+      <div class="logo-icon">🏪</div>
+      <span>TRADIZI</span>
+    </div>
 
-      <a href="#" class="logo">
-        <div class="logo-icon">🏪</div>
-        <span>TRADIZI</span>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#sync">Sync</a>
+      <a href="#pricing">Plans</a>
+      <a href="#contact">Contact</a>
+
+      <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="nav-btn">
+        Download App
+      </a>
+    </div>
+
+  </div>
+</nav>
+
+<section class="hero">
+
+  <div class="container hero-grid">
+
+    <div>
+
+      <div class="badge">
+        The Business Operating System for Modern Traders
+      </div>
+
+      <h1>
+        Stop Running Your Business From
+        <span>Memory & Notebooks</span>
+      </h1>
+
+      <p>
+        TRADIZI helps you track sales, manage inventory, monitor debts,
+        control staff, send receipts, and grow your business — all from one
+        beautifully simple app that works even without internet.
+      </p>
+
+      <div class="hero-actions">
+
+        <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">
+          Download Free on Google Play
+        </a>
+
+        <a href="#features" class="btn btn-secondary">
+          Explore Features
+        </a>
+
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <h3>Offline</h3>
+          <p>Works without internet</p>
+        </div>
+
+        <div class="stat">
+          <h3>Smart</h3>
+          <p>Automated business tracking</p>
+        </div>
+
+        <div class="stat">
+          <h3>Fast</h3>
+          <p>Built for everyday operations</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="hero-card">
+      <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80">
+    </div>
+
+  </div>
+
+</section>
+
+<section id="features">
+
+  <div class="container">
+
+    <div class="section-title">
+      <span>Powerful Features</span>
+      <h2>Everything You Need To Run Your Business</h2>
+      <p>
+        Built for shops, retailers, wholesalers, and growing businesses that
+        want better control, more profit, and less stress.
+      </p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">🛒</div>
+        <h3>Sales Management</h3>
+        <p>
+          Record sales instantly with support for cash, transfer, POS,
+          and credit payments. Automatically deduct stock and send
+          branded receipts via WhatsApp or PDF.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3>Inventory Control</h3>
+        <p>
+          Track stock levels, restocks, low-stock alerts, dead stock,
+          and bulk products sold in smaller units like cups, bottles,
+          cartons, crates, and more.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Credit Book</h3>
+        <p>
+          Track customer debts, due dates, payments, and overdue balances.
+          Send debt reminders directly through WhatsApp in seconds.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Advanced Reports</h3>
+        <p>
+          See profits, top-selling products, revenue trends,
+          stock value, customer debt reports, and export reports
+          to PDF or WhatsApp.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Staff Management</h3>
+        <p>
+          Add sellers and managers with PIN login, control permissions,
+          hide sensitive costs, and track staff-specific sales activity.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Smart Notifications</h3>
+        <p>
+          Get daily sales summaries, customer debt reminders,
+          and scheduled business notifications automatically.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="highlight" id="sync">
+
+  <div class="container highlight-grid">
+
+    <div>
+      <div class="section-title" style="text-align:left;margin-bottom:0;">
+        <span>Built Different</span>
+        <h2>Your Business Never Stops</h2>
+
+        <p style="margin:0;">
+          Most business apps fail when internet becomes unreliable.
+          TRADIZI keeps working smoothly offline and syncs your data
+          automatically when connection returns.
+        </p>
+      </div>
+
+      <div class="highlight-list">
+
+        <div class="highlight-item">
+          <div>✅</div>
+          <div>Offline-first architecture for uninterrupted operations</div>
+        </div>
+
+        <div class="highlight-item">
+          <div>☁️</div>
+          <div>Automatic cloud backup and secure sync</div>
+        </div>
+
+        <div class="highlight-item">
+          <div>⚡</div>
+          <div>Delta sync — only changed records are synced</div>
+        </div>
+
+        <div class="highlight-item">
+          <div>📱</div>
+          <div>Multi-device support for growing teams</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80">
+    </div>
+
+  </div>
+
+</section>
+
+<section>
+
+  <div class="container">
+
+    <div class="section-title">
+      <span>Why Businesses Love It</span>
+      <h2>Built Around Real Business Problems</h2>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gallery-card">
+        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80">
+
+        <div class="gallery-overlay">
+          <div>
+            <h3>Simple & Fast</h3>
+            <p>No complicated accounting systems. Just tools that work.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-card">
+        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80">
+
+        <div class="gallery-overlay">
+          <div>
+            <h3>Designed for Daily Sales</h3>
+            <p>Perfect for busy shops, retail stores, and traders.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-card">
+        <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80">
+
+        <div class="gallery-overlay">
+          <div>
+            <h3>Built to Scale</h3>
+            <p>Start free and upgrade as your business grows.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="pricing">
+
+  <div class="container">
+
+    <div class="section-title">
+      <span>Flexible Plans</span>
+      <h2>Choose What Fits Your Business</h2>
+    </div>
+
+    <div class="pricing">
+
+      <div class="price-card">
+        <h3>Free</h3>
+        <p style="color:var(--muted);">
+          Perfect for small businesses getting started.
+        </p>
+
+        <ul>
+          <li>✔ Limited products & customers</li>
+          <li>✔ Sales tracking</li>
+          <li>✔ Inventory management</li>
+          <li>✔ Credit tracking</li>
+        </ul>
+      </div>
+
+      <div class="price-card featured">
+        <h3>Pro</h3>
+        <p style="color:var(--muted);">
+          For serious businesses that need more power.
+        </p>
+
+        <ul>
+          <li>✔ Unlimited products & customers</li>
+          <li>✔ Full business history</li>
+          <li>✔ Advanced reports</li>
+          <li>✔ Smart exports & analytics</li>
+        </ul>
+      </div>
+
+      <div class="price-card">
+        <h3>Business</h3>
+        <p style="color:var(--muted);">
+          Built for teams and growing operations.
+        </p>
+
+        <ul>
+          <li>✔ Multi-staff support</li>
+          <li>✔ Multi-device sync</li>
+          <li>✔ Permission control</li>
+          <li>✔ Full feature access</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="contact">
+
+  <div class="container">
+
+    <div class="contact">
+
+      <h2 style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:18px;">
+        Your Business Deserves Better Tools
+      </h2>
+
+      <p style="max-width:760px;margin:auto;color:var(--muted);margin-bottom:34px;">
+        Replace notebooks, scattered records, and stressful tracking
+        with one modern app built to help your business grow faster,
+        stay organized, and make smarter decisions every day.
+      </p>
+
+      <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">
+        Download TRADIZI Now
       </a>
 
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#gallery">Business Stories</a>
-        <a href="#contact">Contact</a>
-
-        <a
-          href="https://play.google.com/apps/internaltest/4701749624321956555"
-          class="nav-btn"
-          target="_blank"
-        >
-          Download App
-        </a>
-      </div>
-
-    </div>
-  </nav>
-
-  <!-- HERO -->
-
-  <section class="hero">
-
-    <div class="container hero-grid">
-
-      <div>
-
-        <div class="badge">
-          🇳🇬 Built for Nigerian Traders & Small Businesses
-        </div>
-
-        <h1>
-          Run Your Business Smarter with
-          <span>TRADIZI</span>
-        </h1>
-
-        <p>
-          Track sales, manage inventory, monitor debtors, and grow your
-          business from one powerful mobile app designed specifically for
-          traders, shops, and entrepreneurs in Nigeria.
-        </p>
-
-        <div class="hero-actions">
-
-          <a
-            href="https://play.google.com/apps/internaltest/4701749624321956555"
-            class="btn btn-primary"
-            target="_blank"
-          >
-            Download on Google Play
-          </a>
-
-          <a href="#features" class="btn btn-secondary">
-            Explore Features
-          </a>
-
-        </div>
-
-        <div class="stats">
-
-          <div class="stat">
-            <h3>24/7</h3>
-            <p>Business Access</p>
-          </div>
-
-          <div class="stat">
-            <h3>Offline</h3>
-            <p>Works Without Internet</p>
-          </div>
-
-          <div class="stat">
-            <h3>Simple</h3>
-            <p>Easy for Every Trader</p>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="hero-card">
-        <img
-          src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80"
-          alt="Business owner using smartphone"
-        />
-      </div>
-
     </div>
 
-  </section>
+  </div>
 
-  <!-- FEATURES -->
+</section>
 
-  <section id="features">
-
-    <div class="container">
-
-      <div class="section-title">
-        <span>Why TRADIZI</span>
-        <h2>Everything Your Business Needs</h2>
-        <p>
-          Built to help Nigerian traders save time, reduce mistakes,
-          and grow profits with modern business tools.
-        </p>
-      </div>
-
-      <div class="features-grid">
-
-        <div class="feature-card">
-          <div class="feature-icon">📦</div>
-          <h3>Inventory Management</h3>
-          <p>
-            Easily track stock levels, monitor low inventory,
-            and manage products in real time.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">💳</div>
-          <h3>Sales Tracking</h3>
-          <p>
-            Record sales instantly and view daily, weekly,
-            and monthly business performance.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📈</div>
-          <h3>Business Insights</h3>
-          <p>
-            Understand your growth with smart analytics
-            and simple visual reports.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🧾</div>
-          <h3>Debtor Records</h3>
-          <p>
-            Keep track of customer debts and payment reminders
-            without paperwork stress.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📱</div>
-          <h3>Offline First</h3>
-          <p>
-            Continue using the app even without internet,
-            with automatic syncing when online.
-          </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>Secure & Reliable</h3>
-          <p>
-            Your business data stays protected with modern
-            security and cloud backup support.
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- GALLERY -->
-
-  <section id="gallery">
-
-    <div class="container">
-
-      <div class="section-title">
-        <span>Business Stories</span>
-        <h2>Made for Real Nigerian Entrepreneurs</h2>
-        <p>
-          From retail stores to market stalls, TRADIZI helps
-          business owners stay organized and profitable.
-        </p>
-      </div>
-
-      <div class="gallery-grid">
-
-        <div class="gallery-card">
-          <img
-            src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80"
-            alt="Retail shop"
-          />
-
-          <div class="gallery-overlay">
-            <div>
-              <h3>Retail Stores</h3>
-              <p>Manage products, pricing, and daily sales effortlessly.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="gallery-card">
-          <img
-            src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80"
-            alt="Business meeting"
-          />
-
-          <div class="gallery-overlay">
-            <div>
-              <h3>Growing Teams</h3>
-              <p>Collaborate and monitor operations from anywhere.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="gallery-card">
-          <img
-            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80"
-            alt="Market trader"
-          />
-
-          <div class="gallery-overlay">
-            <div>
-              <h3>Market Traders</h3>
-              <p>Track debts, sales, and inventory with ease.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="testimonial">
-        <p>
-          “TRADIZI made it easier for me to track my stock and daily sales.
-          I no longer write everything in notebooks, and my business feels
-          more organized than ever.”
-        </p>
-
-        <div class="testimonial-author">
-          — Lagos Retail Business Owner
-        </div>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- CONTACT -->
-
-  <section id="contact">
-
-    <div class="container">
-
-      <div class="section-title">
-        <span>Get Started</span>
-        <h2>Ready to Grow Your Business?</h2>
-        <p>
-          Download TRADIZI today and simplify how you run your business.
-        </p>
-      </div>
-
-      <div class="contact-wrapper">
-
-        <div class="contact-card">
-
-          <h3>Contact Information</h3>
-
-          <div class="contact-info">
-
-            <div class="contact-item">
-              <span>📍</span>
-              <div>
-                <strong>Location</strong>
-                <p>Lagos, Nigeria</p>
-              </div>
-            </div>
-
-            <div class="contact-item">
-              <span>⏰</span>
-              <div>
-                <strong>Support Hours</strong>
-                <p>Monday – Saturday • 8:00AM – 6:00PM</p>
-              </div>
-            </div>
-
-            <div class="contact-item">
-              <span>📧</span>
-              <div>
-                <strong>Email</strong>
-                <p>support@tradizi.app</p>
-              </div>
-            </div>
-
-            <div class="contact-item">
-              <span>📱</span>
-              <div>
-                <strong>Platform</strong>
-                <p>Available on Android</p>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="contact-card">
-
-          <h3>Send a Message</h3>
-
-          <form>
-
-            <input type="text" placeholder="Your Name" required />
-
-            <input type="email" placeholder="Your Email" required />
-
-            <textarea placeholder="Tell us about your business..."></textarea>
-
-            <button type="submit" class="btn btn-primary">
-              Send Message
-            </button>
-
-          </form>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- FOOTER -->
-
-  <footer>
-    <div class="container">
-      © 2026 TRADIZI. Built for Nigerian traders and growing businesses.
-    </div>
-  </footer>
-
-  <script>
-    // Simple form interaction
-    const form = document.querySelector("form");
-
-    form.addEventListener("submit", function(e){
-      e.preventDefault();
-      alert("Thanks for reaching out! We’ll get back to you soon.");
-      form.reset();
-    });
-  </script>
+<footer>
+  © 2026 TRADIZI. Built for modern businesses everywhere.
+</footer>
 
 </body>
 </html>
-```
