@@ -4,10 +4,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TRADIZI — Smart Business Operating System</title>
+<title>TRADIZI — Built for Nigerian Traders</title>
 
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
 
 <style>
 :root{
@@ -21,15 +20,7 @@
   --border:rgba(255,255,255,0.08);
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -44,15 +35,7 @@ body{
   margin:auto;
 }
 
-a{
-  text-decoration:none;
-  color:inherit;
-}
-
-img{
-  width:100%;
-  display:block;
-}
+a{text-decoration:none;color:inherit;}
 
 nav{
   position:fixed;
@@ -60,7 +43,7 @@ nav{
   top:0;
   z-index:1000;
   backdrop-filter:blur(14px);
-  background:rgba(7,16,24,0.78);
+  background:rgba(7,16,24,0.88);
   border-bottom:1px solid var(--border);
 }
 
@@ -96,11 +79,6 @@ nav{
 
 .nav-links a{
   color:var(--muted);
-  transition:0.3s;
-}
-
-.nav-links a:hover{
-  color:white;
 }
 
 .nav-btn{
@@ -137,7 +115,7 @@ nav{
 }
 
 .hero h1{
-  font-size:clamp(3rem,6vw,5.5rem);
+  font-size:clamp(3rem,6vw,5rem);
   line-height:0.95;
   margin-bottom:24px;
   font-weight:900;
@@ -168,16 +146,11 @@ nav{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  transition:0.3s;
 }
 
 .btn-primary{
   background:var(--primary);
   color:white;
-}
-
-.btn-primary:hover{
-  background:var(--primary2);
 }
 
 .btn-secondary{
@@ -193,8 +166,18 @@ nav{
 }
 
 .hero-card img{
+  width:100%;
   height:100%;
   object-fit:cover;
+}
+
+.mini-proof{
+  margin-top:28px;
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  color:var(--muted);
+  font-size:0.95rem;
 }
 
 section{
@@ -225,15 +208,16 @@ section{
 }
 
 .features-grid,
-.gallery-grid,
-.pricing{
+.pricing,
+.audience-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:24px;
 }
 
 .feature-card,
-.price-card{
+.price-card,
+.audience-card{
   background:linear-gradient(180deg,var(--card2),var(--card));
   border:1px solid var(--border);
   border-radius:24px;
@@ -249,10 +233,6 @@ section{
   place-items:center;
   font-size:28px;
   margin-bottom:24px;
-}
-
-.feature-card h3{
-  margin-bottom:14px;
 }
 
 .highlight{
@@ -273,41 +253,6 @@ section{
   gap:16px;
 }
 
-.gallery-card{
-  position:relative;
-  overflow:hidden;
-  border-radius:24px;
-  min-height:340px;
-}
-
-.gallery-card img{
-  height:100%;
-  object-fit:cover;
-}
-
-.gallery-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(to top,rgba(0,0,0,0.88),transparent);
-  display:flex;
-  align-items:flex-end;
-  padding:28px;
-}
-
-.price-card.featured{
-  border:1px solid rgba(47,177,111,0.5);
-  transform:scale(1.03);
-}
-
-.price-card ul{
-  list-style:none;
-  margin-top:24px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  color:var(--muted);
-}
-
 .contact{
   text-align:center;
   background:linear-gradient(180deg,#101c28,#0b141d);
@@ -321,43 +266,22 @@ footer{
   padding:28px 0;
   text-align:center;
   color:var(--muted);
-  margin-top:80px;
 }
 
 @media(max-width:980px){
-
 .hero-grid,
 .highlight-grid,
-.pricing{
-  grid-template-columns:1fr;
-}
-
+.pricing,
 .features-grid,
-.gallery-grid{
-  grid-template-columns:1fr 1fr;
+.audience-grid{
+grid-template-columns:1fr;
 }
-
 }
 
 @media(max-width:700px){
-
-.nav-links{
-  display:none;
-}
-
-.features-grid,
-.gallery-grid{
-  grid-template-columns:1fr;
-}
-
-.hero-actions{
-  flex-direction:column;
-}
-
-.btn{
-  width:100%;
-}
-
+.nav-links{display:none;}
+.hero-actions{flex-direction:column;}
+.btn{width:100%;}
 }
 </style>
 </head>
@@ -373,13 +297,12 @@ footer{
 </a>
 
 <div class="nav-links">
-<a href="features.html">Features</a>
-<a href="pricing.html">Plans</a>
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
+<a href="#features">Features</a>
+<a href="#pricing">Plans</a>
+<a href="#contact">Contact</a>
 
 <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="nav-btn">
-Download App
+Start Free
 </a>
 </div>
 
@@ -393,30 +316,35 @@ Download App
 <div>
 
 <div class="badge">
-Smart Commerce Infrastructure for Modern Businesses
+Built for Nigerian Traders & Online Sellers
 </div>
 
 <h1>
-The Business App That Keeps
-<span>Everything Under Control</span>
+Run Your Business Smarter —
+<span>Anywhere, Even Without Internet</span>
 </h1>
 
 <p>
-TRADIZI helps businesses manage inventory, sales, debts, reports,
-staff, receipts, and daily operations from one seamless platform —
-built to simplify commerce for modern businesses everywhere.
+TRADIZI helps traders and online sellers record sales faster, track customer debts, manage stock, send receipts and monitor business performance — all from one simple app that works even without internet.
 </p>
 
 <div class="hero-actions">
 
 <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">
-Download Free on Google Play
+Start Free Today
 </a>
 
 <a href="#features" class="btn btn-secondary">
-Explore Features
+See How It Works
 </a>
 
+</div>
+
+<div class="mini-proof">
+<div>📱 Works Offline</div>
+<div>💬 WhatsApp Receipts</div>
+<div>📦 Stock Tracking</div>
+<div>📋 Debt Tracking</div>
 </div>
 
 </div>
@@ -429,17 +357,52 @@ Explore Features
 
 </section>
 
+<section>
+
+<div class="container">
+
+<div class="section-title">
+<span>Perfect For</span>
+<h2>Built Around How Nigerian Traders Actually Sell</h2>
+
+<p>
+Whether you sell in a shop, market, WhatsApp or Instagram, TRADIZI helps you stay organized and operate professionally.
+</p>
+</div>
+
+<div class="audience-grid">
+
+<div class="audience-card">
+<h3>🏪 Shop Owners</h3>
+<p>Track daily sales, manage stock and monitor business performance with ease.</p>
+</div>
+
+<div class="audience-card">
+<h3>📱 WhatsApp & Instagram Sellers</h3>
+<p>Manage customer orders, send receipts instantly and stay organized professionally.</p>
+</div>
+
+<div class="audience-card">
+<h3>🛒 Growing Businesses</h3>
+<p>Perfect for traders, teams and businesses ready to scale confidently.</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
 <section id="features">
 
 <div class="container">
 
 <div class="section-title">
 <span>Core Features</span>
-<h2>Run Your Entire Business From One App</h2>
+<h2>Everything You Need To Run Your Business Daily</h2>
 
 <p>
-Everything from sales tracking and inventory management
-to analytics, credit tracking, cloud backup, and staff control.
+From recording sales and tracking stock to managing debts and sending receipts, TRADIZI helps you stay fully organized and in control every day.
 </p>
 </div>
 
@@ -447,62 +410,49 @@ to analytics, credit tracking, cloud backup, and staff control.
 
 <div class="feature-card">
 <div class="feature-icon">🛒</div>
-<h3>Sales Management</h3>
-
+<h3>Sell Faster</h3>
 <p>
-Record transactions instantly with support for cash, transfer,
-POS, and credit payments. Generate branded receipts and share
-them through WhatsApp or PDF.
+Record sales in seconds, send professional receipts instantly and manage cash, transfer, POS and credit payments without stress.
 </p>
 </div>
 
 <div class="feature-card">
 <div class="feature-icon">📦</div>
-<h3>Inventory Management</h3>
-
+<h3>Reduce Stock Losses</h3>
 <p>
-Track stock levels, bulk products, packaging units,
-restocks, low-stock alerts, and inventory value in real time.
+Know what is in stock, what is running low and what needs restocking before shortages affect your business.
 </p>
 </div>
 
 <div class="feature-card">
 <div class="feature-icon">📋</div>
-<h3>Credit Tracking</h3>
-
+<h3>Recover Debts Effectively</h3>
 <p>
-Manage customer debts, due dates, repayment history,
-and automated payment reminders from one place.
+Stop forgetting who owes you money. Track customer debts, repayments and send reminders professionally.
 </p>
 </div>
 
 <div class="feature-card">
 <div class="feature-icon">📊</div>
-<h3>Advanced Reports</h3>
-
+<h3>Monitor Business Performance</h3>
 <p>
-Get insights into profits, top products, revenue trends,
-fast-moving stock, and business performance.
+Track profits, top products and business performance with reports that help you make smarter decisions.
 </p>
 </div>
 
 <div class="feature-card">
 <div class="feature-icon">👥</div>
-<h3>Team & Staff Control</h3>
-
+<h3>Manage Staff Confidently</h3>
 <p>
-Add managers and staff with PIN login,
-role permissions, and activity tracking.
+Control staff access, track activities and improve accountability across your business.
 </p>
 </div>
 
 <div class="feature-card">
-<div class="feature-icon">🔔</div>
-<h3>Smart Automation</h3>
-
+<div class="feature-icon">💬</div>
+<h3>Professional Customer Experience</h3>
 <p>
-Receive daily summaries, debt reminders,
-and operational notifications automatically.
+Send receipts directly through WhatsApp and improve customer trust with organized business operations.
 </p>
 </div>
 
@@ -512,14 +462,14 @@ and operational notifications automatically.
 
 </section>
 
-<section class="highlight" id="sync">
+<section class="highlight">
 
 <div class="container highlight-grid">
 
 <div>
 
 <div class="section-title" style="text-align:left;margin-bottom:0;">
-<span>Built For Reliability</span>
+<span>Built For Real Nigerian Business Conditions</span>
 
 <h2>
 Your Business Keeps Running —
@@ -527,92 +477,23 @@ Even Without Internet
 </h2>
 
 <p style="margin:0;">
-TRADIZI was engineered with an offline-first architecture,
-automatic cloud backup, and fast delta sync technology
-to keep businesses running without interruptions.
+Poor network should never stop your business. TRADIZI works offline, allowing you to record sales, manage stock and access your records anytime, anywhere.
 </p>
 
 </div>
 
 <div class="highlight-list">
-
-<div>✅ Offline-first experience</div>
-<div>☁️ Your business data is safely backed up automatically</div>
-<div>⚡ Changes update quickly across your devices</div>
-<div>📱 Access your business from multiple devices</div>
-<div>🔒 Your business information stays private and protected</div>
-
+<div>✅ Works without internet</div>
+<div>✅ Your records stay safe and backed up</div>
+<div>✅ Access your business anytime</div>
+<div>✅ Built for both shop owners and online sellers</div>
+<div>✅ Fast, simple and reliable daily use</div>
 </div>
 
 </div>
 
 <div class="hero-card">
-<img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=80">
-</div>
-
-</div>
-
-</section>
-
-<section>
-
-<div class="container">
-
-<div class="section-title">
-<span>Why Businesses Choose TRADIZI</span>
-
-<h2>
-Business Tools That Actually Work
-</h2>
-
-<p>
-Simple enough for daily use.
-Powerful enough to scale with growing businesses.
-</p>
-
-</div>
-
-<div class="gallery-grid">
-
-<div class="gallery-card">
-
-<img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=1200&q=80">
-
-<div class="gallery-overlay">
-<div>
-<h3>Fast & Intuitive</h3>
-<p>No complicated systems or accounting jargon.</p>
-</div>
-</div>
-
-</div>
-
-<div class="gallery-card">
-
-<img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80">
-
-<div class="gallery-overlay">
-<div>
-<h3>Built for Daily Operations</h3>
-<p>Track sales, inventory, debtors, and reports effortlessly.</p>
-</div>
-</div>
-
-</div>
-
-<div class="gallery-card">
-
-<img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80">
-
-<div class="gallery-overlay">
-<div>
-<h3>Ready to Scale</h3>
-<p>Perfect for solo businesses, teams, and growing operations.</p>
-</div>
-</div>
-
-</div>
-
+<img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80">
 </div>
 
 </div>
@@ -625,64 +506,49 @@ Powerful enough to scale with growing businesses.
 
 <div class="section-title">
 <span>Flexible Plans</span>
+<h2>Flexible Plans For Every Type Of Trader</h2>
 
-<h2>
-Choose The Right Plan For Your Business
-</h2>
-
+<p>
+Start free and upgrade only when your business grows.
+</p>
 </div>
 
 <div class="pricing">
 
 <div class="price-card">
-
 <h3>Free</h3>
+<p style="color:var(--muted);">Perfect for traders getting started.</p>
 
-<p style="color:var(--muted);">
-Perfect for businesses getting started.
-</p>
-
-<ul>
-<li>✔ Sales tracking</li>
-<li>✔ Inventory management</li>
-<li>✔ Credit book</li>
-<li>✔ Limited history & products</li>
+<ul style="margin-top:20px;color:var(--muted);padding-left:18px;">
+<li>Sales tracking</li>
+<li>Inventory management</li>
+<li>Credit tracking</li>
+<li>WhatsApp receipts</li>
 </ul>
-
 </div>
 
-<div class="price-card featured">
-
+<div class="price-card" style="border:1px solid rgba(47,177,111,0.5);">
 <h3>Pro</h3>
+<p style="color:var(--muted);">Advanced tools for growing businesses.</p>
 
-<p style="color:var(--muted);">
-Advanced tools for growing businesses.
-</p>
-
-<ul>
-<li>✔ Unlimited products & customers</li>
-<li>✔ Full business history</li>
-<li>✔ Advanced analytics</li>
-<li>✔ Powerful reporting tools</li>
+<ul style="margin-top:20px;color:var(--muted);padding-left:18px;">
+<li>Unlimited products & customers</li>
+<li>Advanced reports</li>
+<li>Full business history</li>
+<li>Multi-device access</li>
 </ul>
-
 </div>
 
 <div class="price-card">
-
 <h3>Business</h3>
+<p style="color:var(--muted);">For teams and larger operations.</p>
 
-<p style="color:var(--muted);">
-For teams and multi-device operations.
-</p>
-
-<ul>
-<li>✔ Multi-staff support</li>
-<li>✔ Multi-device sync</li>
-<li>✔ Permission control</li>
-<li>✔ Full feature access</li>
+<ul style="margin-top:20px;color:var(--muted);padding-left:18px;">
+<li>Staff management</li>
+<li>Permission control</li>
+<li>Multi-staff support</li>
+<li>Full business control</li>
 </ul>
-
 </div>
 
 </div>
@@ -698,17 +564,15 @@ For teams and multi-device operations.
 <div class="contact">
 
 <h2 style="font-size:clamp(2rem,4vw,3.4rem);margin-bottom:18px;">
-Modern Businesses Need Modern Tools
+Stop Running Your Business With Guesswork
 </h2>
 
 <p style="max-width:760px;margin:auto;color:var(--muted);margin-bottom:34px;">
-Replace notebooks, scattered spreadsheets,
-and stressful manual tracking with one modern platform
-built to help businesses grow smarter and operate faster.
+Replace notebooks, scattered WhatsApp chats and stressful manual tracking with one simple app built to help Nigerian traders stay organized, recover debts, monitor stock and grow confidently.
 </p>
 
 <a href="https://play.google.com/apps/internaltest/4701749624321956555" class="btn btn-primary">
-Download TRADIZI
+Start Using TRADIZI Free
 </a>
 
 </div>
@@ -718,7 +582,7 @@ Download TRADIZI
 </section>
 
 <footer>
-© 2026 TRADIZI. Smart tools for modern commerce.
+© 2026 TRADIZI — Built for Nigerian Traders & Online Sellers.
 </footer>
 
 </body>
