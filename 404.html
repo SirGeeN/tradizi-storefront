@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TRADIZI — Download the App</title>
+  <title>TRADIZI Store</title>
   <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
   <link rel="apple-touch-icon" sizes="512x512" href="/favicon.png">
   <style>
@@ -12,59 +12,407 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #0D1117;
       color: #E6EDF3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      padding: 24px;
-      text-align: center;
+      padding-bottom: 90px; /* space for the fixed cart bar */
+    }
+    .center-page {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px; text-align: center;
     }
     .card { max-width: 360px; width: 100%; }
     .logo { font-size: 56px; margin-bottom: 16px; }
     h1 { font-size: 32px; font-weight: 700; color: #1E7A4F; margin-bottom: 8px; }
     p { font-size: 15px; color: #9EAAB6; line-height: 1.6; margin-bottom: 32px; }
     .btn {
-      display: inline-block;
-      background: #1E7A4F;
-      color: #fff;
-      text-decoration: none;
-      padding: 14px 32px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      width: 100%;
+      display: inline-block; background: #1E7A4F; color: #fff;
+      text-decoration: none; padding: 14px 32px; border-radius: 12px;
+      font-size: 16px; font-weight: 700; width: 100%; border: none;
+      cursor: pointer;
     }
-    .btn:hover { background: #2fb16f; }
     .sub { margin-top: 16px; font-size: 13px; color: #6B7280; }
-  </style>
-  <script>
-    // If URL contains /shop/ — this is a storefront deep link
-    // Redirect to Play Store to download the app
-    const path = window.location.pathname;
-    const PLAY_STORE = 'https://play.google.com/store/apps/details?id=app.tradeeasy.ng';
-    if (path.indexOf('/shop/') === 0 || path === '/shop') {
-      window.location.replace(PLAY_STORE);
+
+    /* ── Storefront layout ── */
+    header.shop {
+      background: linear-gradient(135deg, #1E7A4F, #2fb16f);
+      padding: 24px 20px 28px;
+      border-radius: 0 0 20px 20px;
     }
-  </script>
+    .biz-name { font-size: 22px; font-weight: 800; color: #fff; }
+    .verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; color: #fff; background: rgba(255,255,255,0.2);
+      padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+    }
+    .powered {
+      font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 10px;
+    }
+
+    .products {
+      padding: 16px; display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .product-card {
+      background: #161B22; border: 1px solid #30363D;
+      border-radius: 14px; padding: 12px; display: flex;
+      flex-direction: column; gap: 8px;
+    }
+    .product-img {
+      width: 100%; aspect-ratio: 1; border-radius: 10px;
+      background: #21262D; display: flex; align-items: center;
+      justify-content: center; font-size: 32px;
+    }
+    .product-name {
+      font-size: 13px; font-weight: 600; color: #E6EDF3;
+      line-height: 1.3; min-height: 34px;
+    }
+    .product-price { font-size: 15px; font-weight: 800; color: #1E7A4F; }
+    .qty-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 4px;
+    }
+    .qty-btn {
+      width: 30px; height: 30px; border-radius: 8px; border: 1px solid #30363D;
+      background: #21262D; color: #E6EDF3; font-size: 16px; font-weight: 700;
+      cursor: pointer;
+    }
+    .qty-value { font-size: 14px; font-weight: 700; min-width: 24px; text-align: center; }
+    .add-btn {
+      width: 100%; padding: 8px; border-radius: 8px; border: none;
+      background: #1E7A4F; color: #fff; font-size: 13px; font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cart-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #161B22; border-top: 1px solid #30363D;
+      padding: 14px 16px; display: none;
+      align-items: center; justify-content: space-between;
+      gap: 12px;
+    }
+    .cart-bar.visible { display: flex; }
+    .cart-total { font-size: 15px; font-weight: 800; }
+    .cart-count { font-size: 12px; color: #9EAAB6; }
+    .cart-actions { display: flex; gap: 8px; }
+    .cart-actions button {
+      padding: 12px 16px; border-radius: 10px; border: none;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .btn-whatsapp { background: #25D366; color: #0D1117; }
+    .btn-paynow { background: #30363D; color: #6B7280; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #6B7280; }
+
+    /* ── Order confirmation modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      align-items: flex-end; justify-content: center; z-index: 10;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal {
+      background: #161B22; border-radius: 20px 20px 0 0; padding: 24px 20px;
+      width: 100%; max-width: 420px;
+    }
+    .modal h2 { font-size: 18px; margin-bottom: 16px; color: #E6EDF3; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: #9EAAB6; margin-bottom: 6px; }
+    .field input {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363D;
+      background: #0D1117; color: #E6EDF3; font-size: 14px;
+    }
+    .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+    .btn-cancel { background: #21262D; color: #9EAAB6; }
+    .btn-confirm { background: #25D366; color: #0D1117; }
+    .modal-error { color: #F85149; font-size: 13px; margin-top: 8px; display: none; }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">🏪</div>
-    <h1>TRADIZI</h1>
-    <p id="msg">A business shared their TRADIZI store with you. Download the app to view their products and place orders.</p>
-    <a class="btn" href="https://play.google.com/store/apps/details?id=app.tradeeasy.ng">
-      Download TRADIZI Free
-    </a>
-    <p class="sub">Free on Google Play Store</p>
+
+  <!-- Shown while resolving which page to render -->
+  <div id="loading" class="center-page">
+    <div class="card">
+      <div class="logo">🏪</div>
+      <p>Loading store...</p>
+    </div>
   </div>
+
+  <!-- Fallback: no /shop/ path, or business not found -->
+  <div id="fallback" class="center-page" style="display:none">
+    <div class="card">
+      <div class="logo">🏪</div>
+      <h1>TRADIZI</h1>
+      <p id="fallback-msg">A business shared their TRADIZI store with you. Download the app to view their products and place orders.</p>
+      <a class="btn" href="https://play.google.com/store/apps/details?id=app.tradeeasy.ng">Download TRADIZI Free</a>
+      <p class="sub">Free on Google Play Store</p>
+    </div>
+  </div>
+
+  <!-- Real storefront -->
+  <div id="storefront" style="display:none">
+    <header class="shop">
+      <div class="biz-name" id="biz-name"></div>
+      <div class="verified" id="verified-badge" style="display:none">✓ Verified</div>
+      <div class="powered">🏪 Powered by TRADIZI</div>
+    </header>
+    <div class="products" id="product-grid"></div>
+    <div class="empty-state" id="empty-products" style="display:none">No products available right now.</div>
+  </div>
+
+  <div class="cart-bar" id="cart-bar">
+    <div>
+      <div class="cart-total" id="cart-total">₦0</div>
+      <div class="cart-count" id="cart-count">0 items</div>
+    </div>
+    <div class="cart-actions">
+      <button class="btn-paynow" id="pay-now-btn">Pay Now</button>
+      <button class="btn-whatsapp" id="order-whatsapp-btn">Order via WhatsApp</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal">
+      <h2>Complete Your Order</h2>
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="customer-name" placeholder="e.g. Amaka Johnson">
+      </div>
+      <div class="field">
+        <label>Your Phone Number</label>
+        <input type="tel" id="customer-phone" placeholder="e.g. 08012345678">
+      </div>
+      <p class="modal-error" id="modal-error"></p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="modal-cancel">Cancel</button>
+        <button class="btn-confirm" id="modal-confirm">Continue to WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Update message based on URL context
+    // ═══════════════════════════════════════════════════════════
+    // CONFIG — fill in your actual Supabase project values.
+    // The anon key is meant to be public/client-embeddable — this
+    // is not a secret the way the service role key is.
+    // ═══════════════════════════════════════════════════════════
+    const SUPABASE_URL = ''https://yidlvvgeywnfmficuzys.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI'
+    const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-web-order`;
+    const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.tradeeasy.ng';
+
     const path = window.location.pathname;
-    if (path.indexOf('/shop/') !== 0) {
-      document.getElementById('msg').textContent =
-        'The page you are looking for does not exist. Go back to TRADIZI.';
-      document.querySelector('.btn').href = '/';
-      document.querySelector('.btn').textContent = 'Go to TRADIZI';
+    const cart = {}; // productId -> { product, quantity }
+
+    function formatNaira(amount) {
+      return '₦' + Number(amount).toLocaleString('en-NG');
+    }
+
+    function show(id) {
+      document.getElementById(id).style.display = id === 'storefront' ? 'block' : 'flex';
+    }
+    function hide(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    async function sbFetch(path, params = '') {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}${params}`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+      if (!res.ok) return null;
+      return res.json();
+    }
+
+    async function loadStorefront(bizId) {
+      const [businesses, storefronts, products] = await Promise.all([
+        sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
+        sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description`),
+      ]);
+
+      const business = businesses && businesses[0];
+      const storefront = storefronts && storefronts[0];
+
+      if (!business || !storefront || storefront.is_public !== true) {
+        hide('loading');
+        document.getElementById('fallback-msg').textContent =
+          'This store is not available right now. Download TRADIZI to explore more businesses.';
+        show('fallback');
+        return;
+      }
+
+      const disabledIds = storefront.disabled_product_ids || [];
+      const visibleProducts = (products || []).filter(p => !disabledIds.includes(p.local_id));
+
+      renderStorefront(business, storefront, visibleProducts);
+    }
+
+    function renderStorefront(business, storefront, products) {
+      hide('loading');
+      document.getElementById('biz-name').textContent = business.business_name || 'TRADIZI Store';
+      show('storefront');
+
+      const grid = document.getElementById('product-grid');
+      if (products.length === 0) {
+        document.getElementById('empty-products').style.display = 'block';
+        return;
+      }
+
+      grid.innerHTML = products.map(p => `
+        <div class="product-card" data-id="${p.local_id}">
+          <div class="product-img">📦</div>
+          <div class="product-name">${escapeHtml(p.name)}</div>
+          ${storefront.show_prices !== false
+            ? `<div class="product-price">${formatNaira(p.selling_price)}</div>`
+            : ''}
+          <div class="qty-row" id="qty-row-${p.local_id}">
+            <button class="add-btn" onclick="addToCart('${p.local_id}')">Add</button>
+          </div>
+        </div>
+      `).join('');
+
+      window._products = Object.fromEntries(products.map(p => [p.local_id, p]));
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    window.addToCart = function(productId) {
+      const product = window._products[productId];
+      if (!cart[productId]) cart[productId] = { product, quantity: 0 };
+      cart[productId].quantity += 1;
+      renderQtyRow(productId);
+      renderCartBar();
+    };
+
+    window.changeQty = function(productId, delta) {
+      if (!cart[productId]) return;
+      cart[productId].quantity += delta;
+      if (cart[productId].quantity <= 0) delete cart[productId];
+      renderQtyRow(productId);
+      renderCartBar();
+    };
+
+    function renderQtyRow(productId) {
+      const row = document.getElementById(`qty-row-${productId}`);
+      const entry = cart[productId];
+      if (!entry) {
+        row.innerHTML = `<button class="add-btn" onclick="addToCart('${productId}')">Add</button>`;
+        return;
+      }
+      row.innerHTML = `
+        <button class="qty-btn" onclick="changeQty('${productId}', -1)">−</button>
+        <span class="qty-value">${entry.quantity}</span>
+        <button class="qty-btn" onclick="changeQty('${productId}', 1)">+</button>
+      `;
+    }
+
+    function renderCartBar() {
+      const items = Object.values(cart);
+      const bar = document.getElementById('cart-bar');
+      if (items.length === 0) {
+        bar.classList.remove('visible');
+        return;
+      }
+      bar.classList.add('visible');
+      const total = items.reduce((sum, i) => sum + (i.product.selling_price * i.quantity), 0);
+      const count = items.reduce((sum, i) => sum + i.quantity, 0);
+      document.getElementById('cart-total').textContent = formatNaira(total);
+      document.getElementById('cart-count').textContent = `${count} item${count === 1 ? '' : 's'}`;
+    }
+
+    // ── PAY NOW — stubbed until Paystack credentials are available ──
+    document.getElementById('pay-now-btn').addEventListener('click', () => {
+      alert('Online payment is coming very soon! For now, please use "Order via WhatsApp" to complete your purchase.');
+    });
+
+    // ── Order via WhatsApp ──────────────────────────────────────
+    document.getElementById('order-whatsapp-btn').addEventListener('click', () => {
+      document.getElementById('modal-error').style.display = 'none';
+      document.getElementById('order-modal').classList.add('visible');
+    });
+    document.getElementById('modal-cancel').addEventListener('click', () => {
+      document.getElementById('order-modal').classList.remove('visible');
+    });
+
+    document.getElementById('modal-confirm').addEventListener('click', async () => {
+      const name = document.getElementById('customer-name').value.trim();
+      const phone = document.getElementById('customer-phone').value.trim();
+      const errorEl = document.getElementById('modal-error');
+      errorEl.style.display = 'none';
+
+      if (!name || !phone) {
+        errorEl.textContent = 'Please enter your name and phone number.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const bizId = path.split('/shop/')[1];
+      const items = Object.entries(cart).map(([productId, entry]) => ({
+        product_id: productId,
+        quantity: entry.quantity,
+      }));
+
+      const confirmBtn = document.getElementById('modal-confirm');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Please wait...';
+
+      try {
+        const res = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            business_id: bizId,
+            customer_name: name,
+            customer_phone: phone,
+            items,
+          }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          errorEl.textContent = data.error || 'Could not create your order. Please try again.';
+          errorEl.style.display = 'block';
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Continue to WhatsApp';
+          return;
+        }
+
+        window.location.href = data.whatsapp_url;
+      } catch (e) {
+        errorEl.textContent = 'Network error — please check your connection and try again.';
+        errorEl.style.display = 'block';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Continue to WhatsApp';
+      }
+    });
+
+    // ── Entry point ───────────────────────────────────────────────
+    if (path.indexOf('/shop/') === 0) {
+      const bizId = path.split('/shop/')[1]?.replace(/\/$/, '');
+      if (bizId) {
+        loadStorefront(bizId);
+      } else {
+        hide('loading');
+        show('fallback');
+      }
+    } else {
+      // Not a /shop/ path — genuine 404, not a storefront link
+      hide('loading');
+      document.getElementById('fallback-msg').textContent =
+        'The page you are looking for does not exist.';
+      document.querySelector('#fallback .btn').textContent = 'Go to TRADIZI';
+      document.querySelector('#fallback .btn').href = '/';
+      show('fallback');
     }
   </script>
 </body>
