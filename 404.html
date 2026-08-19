@@ -67,6 +67,11 @@
       line-height: 1.3; min-height: 34px;
     }
     .product-price { font-size: 15px; font-weight: 800; color: #1E7A4F; }
+    .stock-label { font-size: 11px; font-weight: 600; }
+    .stock-label.low { color: #D29922; }
+    .stock-label.out { color: #F85149; }
+    .product-card.out-of-stock { opacity: 0.6; }
+    .add-btn:disabled { background: #30363D; color: #6B7280; cursor: not-allowed; }
     .qty-row {
       display: flex; align-items: center; justify-content: space-between;
       margin-top: 4px;
@@ -195,7 +200,7 @@
     // The anon key is meant to be public/client-embeddable — this
     // is not a secret the way the service role key is.
     // ═══════════════════════════════════════════════════════════
-    const SUPABASE_URL = ''https://yidlvvgeywnfmficuzys.supabase.co';
+    const SUPABASE_URL = 'https://yidlvvgeywnfmficuzys.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI'
     const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-web-order`;
     const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.tradeeasy.ng';
@@ -229,7 +234,7 @@
       const [businesses, storefronts, products] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
-        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity`),
       ]);
 
       const business = businesses && businesses[0];
@@ -260,18 +265,27 @@
         return;
       }
 
-      grid.innerHTML = products.map(p => `
-        <div class="product-card" data-id="${p.local_id}">
+      grid.innerHTML = products.map(p => {
+        const inStock = Number(p.quantity) > 0;
+        const stockLabel = !inStock
+          ? '<div class="stock-label out">Out of stock</div>'
+          : (p.quantity <= 5 ? `<div class="stock-label low">Only ${p.quantity} left</div>` : '');
+        return `
+        <div class="product-card${!inStock ? ' out-of-stock' : ''}" data-id="${p.local_id}">
           <div class="product-img">📦</div>
           <div class="product-name">${escapeHtml(p.name)}</div>
           ${storefront.show_prices !== false
             ? `<div class="product-price">${formatNaira(p.selling_price)}</div>`
             : ''}
+          ${stockLabel}
           <div class="qty-row" id="qty-row-${p.local_id}">
-            <button class="add-btn" onclick="addToCart('${p.local_id}')">Add</button>
+            ${inStock
+              ? `<button class="add-btn" onclick="addToCart('${p.local_id}')">Add</button>`
+              : `<button class="add-btn" disabled>Sold Out</button>`}
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       window._products = Object.fromEntries(products.map(p => [p.local_id, p]));
     }
@@ -284,15 +298,20 @@
 
     window.addToCart = function(productId) {
       const product = window._products[productId];
+      const available = Number(product.quantity) || 0;
+      if (available <= 0) return;
       if (!cart[productId]) cart[productId] = { product, quantity: 0 };
-      cart[productId].quantity += 1;
+      if (cart[productId].quantity < available) cart[productId].quantity += 1;
       renderQtyRow(productId);
       renderCartBar();
     };
 
     window.changeQty = function(productId, delta) {
       if (!cart[productId]) return;
-      cart[productId].quantity += delta;
+      const available = Number(cart[productId].product.quantity) || 0;
+      const next = cart[productId].quantity + delta;
+      if (next > available) return; // can't exceed stock
+      cart[productId].quantity = next;
       if (cart[productId].quantity <= 0) delete cart[productId];
       renderQtyRow(productId);
       renderCartBar();
