@@ -47,6 +47,47 @@
       font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 10px;
     }
 
+    .app-nudge {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; background: #161B22; border: 1px solid #30363D;
+      margin: 12px 16px 0; padding: 10px 14px; border-radius: 12px;
+      font-size: 12px; color: #9EAAB6;
+    }
+    .app-nudge a {
+      color: #1E7A4F; font-weight: 700; text-decoration: none;
+      white-space: nowrap;
+    }
+    .app-nudge .close-nudge {
+      background: none; border: none; color: #6B7280; font-size: 16px;
+      cursor: pointer; padding: 0 4px;
+    }
+
+    .search-bar {
+      margin: 14px 16px 0; position: relative;
+    }
+    .search-bar input {
+      width: 100%; padding: 12px 14px 12px 38px; border-radius: 12px;
+      border: 1px solid #30363D; background: #161B22; color: #E6EDF3;
+      font-size: 14px;
+    }
+    .search-bar input::placeholder { color: #6B7280; }
+    .search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: #6B7280; font-size: 14px; pointer-events: none;
+    }
+
+    .category-chips {
+      display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .category-chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; padding: 8px 16px; border-radius: 20px;
+      border: 1px solid #30363D; background: transparent; color: #9EAAB6;
+      font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .chip.active { background: #1E7A4F; border-color: #1E7A4F; color: #fff; }
+
     .products {
       padding: 16px; display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -160,6 +201,20 @@
       <div class="verified" id="verified-badge" style="display:none">✓ Verified</div>
       <div class="powered">🏪 Powered by TRADIZI</div>
     </header>
+
+    <div class="app-nudge" id="app-nudge">
+      <span>📲 Get the full experience — order faster, track your orders</span>
+      <a href="https://play.google.com/store/apps/details?id=app.tradeeasy.ng">Get App</a>
+      <button class="close-nudge" id="close-nudge" aria-label="Dismiss">✕</button>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search products...">
+    </div>
+
+    <div class="category-chips" id="category-chips"></div>
+
     <div class="products" id="product-grid"></div>
     <div class="empty-state" id="empty-products" style="display:none">No products available right now.</div>
   </div>
@@ -201,12 +256,33 @@
     // is not a secret the way the service role key is.
     // ═══════════════════════════════════════════════════════════
     const SUPABASE_URL = 'https://yidlvvgeywnfmficuzys.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI';
     const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-web-order`;
     const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.tradeeasy.ng';
 
     const path = window.location.pathname;
     const cart = {}; // productId -> { product, quantity }
+    let allProducts = [];   // full fetched list, unfiltered
+    let activeCategory = 'All';
+    let searchQuery = '';
+
+    // Broad coverage of common small-business categories, with a
+    // sensible fallback (📦) for anything not recognized — category
+    // is free-text on Product, not a fixed enum, so this can't be
+    // exhaustive by design.
+    const CATEGORY_ICONS = {
+      clothing: '👕', clothes: '👕', fashion: '👗', shoes: '👟',
+      food: '🍽️', groceries: '🛒', beverages: '🥤', drinks: '🥤',
+      snacks: '🍪', electronics: '📱', phones: '📱', accessories: '💍',
+      beauty: '💄', cosmetics: '💄', health: '💊', household: '🏠',
+      furniture: '🛋️', stationery: '✏️', books: '📚', toys: '🧸',
+      automotive: '🚗', hardware: '🔧', bags: '👜', jewelry: '💎',
+      other: '📦',
+    };
+    function categoryIcon(category) {
+      if (!category) return '📦';
+      return CATEGORY_ICONS[category.toLowerCase().trim()] || '📦';
+    }
 
     function formatNaira(amount) {
       return '₦' + Number(amount).toLocaleString('en-NG');
@@ -234,7 +310,7 @@
       const [businesses, storefronts, products] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
-        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category`),
       ]);
 
       const business = businesses && businesses[0];
@@ -259,11 +335,54 @@
       document.getElementById('biz-name').textContent = business.business_name || 'TRADIZI Store';
       show('storefront');
 
+      allProducts = products;
+      window._products = Object.fromEntries(products.map(p => [p.local_id, p]));
+      window._showPrices = storefront.show_prices !== false;
+
+      renderCategoryChips();
+      renderFilteredProducts();
+    }
+
+    function renderCategoryChips() {
+      const categories = ['All', ...new Set(
+        allProducts.map(p => p.category).filter(c => c && c.trim())
+      )];
+      const container = document.getElementById('category-chips');
+      container.innerHTML = categories.map(c => `
+        <button class="chip${c === activeCategory ? ' active' : ''}"
+                onclick="selectCategory('${escapeHtml(c).replace(/'/g, "\\'")}')">${escapeHtml(c)}</button>
+      `).join('');
+    }
+
+    window.selectCategory = function(category) {
+      activeCategory = category;
+      renderCategoryChips();
+      renderFilteredProducts();
+    };
+
+    function renderFilteredProducts() {
+      const q = searchQuery.trim().toLowerCase();
+      const filtered = allProducts.filter(p => {
+        const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+        const matchesSearch = !q || p.name.toLowerCase().includes(q);
+        return matchesCategory && matchesSearch;
+      });
+      renderProductGrid(filtered, window._showPrices);
+    }
+
+    function renderProductGrid(products, showPrices) {
       const grid = document.getElementById('product-grid');
+      const emptyEl = document.getElementById('empty-products');
+
       if (products.length === 0) {
-        document.getElementById('empty-products').style.display = 'block';
+        grid.innerHTML = '';
+        emptyEl.style.display = 'block';
+        emptyEl.textContent = allProducts.length === 0
+          ? 'No products available right now.'
+          : 'No products match your search.';
         return;
       }
+      emptyEl.style.display = 'none';
 
       grid.innerHTML = products.map(p => {
         const inStock = Number(p.quantity) > 0;
@@ -272,9 +391,9 @@
           : (p.quantity <= 5 ? `<div class="stock-label low">Only ${p.quantity} left</div>` : '');
         return `
         <div class="product-card${!inStock ? ' out-of-stock' : ''}" data-id="${p.local_id}">
-          <div class="product-img">📦</div>
+          <div class="product-img">${categoryIcon(p.category)}</div>
           <div class="product-name">${escapeHtml(p.name)}</div>
-          ${storefront.show_prices !== false
+          ${showPrices
             ? `<div class="product-price">${formatNaira(p.selling_price)}</div>`
             : ''}
           ${stockLabel}
@@ -287,8 +406,18 @@
       `;
       }).join('');
 
-      window._products = Object.fromEntries(products.map(p => [p.local_id, p]));
+      // Re-apply any existing cart quantities to the freshly rendered rows
+      Object.keys(cart).forEach(renderQtyRow);
     }
+
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderFilteredProducts();
+    });
+
+    document.getElementById('close-nudge').addEventListener('click', () => {
+      document.getElementById('app-nudge').style.display = 'none';
+    });
 
     function escapeHtml(str) {
       const d = document.createElement('div');
@@ -319,6 +448,7 @@
 
     function renderQtyRow(productId) {
       const row = document.getElementById(`qty-row-${productId}`);
+      if (!row) return; // product currently filtered out of view — nothing to update
       const entry = cart[productId];
       if (!entry) {
         row.innerHTML = `<button class="add-btn" onclick="addToCart('${productId}')">Add</button>`;
