@@ -101,7 +101,10 @@
     .product-img {
       width: 100%; aspect-ratio: 1; border-radius: 10px;
       background: #21262D; display: flex; align-items: center;
-      justify-content: center; font-size: 32px;
+      justify-content: center; font-size: 32px; overflow: hidden;
+    }
+    .product-img img {
+      width: 100%; height: 100%; object-fit: cover;
     }
     .product-name {
       font-size: 13px; font-weight: 600; color: #E6EDF3;
@@ -310,7 +313,7 @@
       const [businesses, storefronts, products] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
-        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category,image_url`),
       ]);
 
       const business = businesses && businesses[0];
@@ -391,7 +394,10 @@
           : (p.quantity <= 5 ? `<div class="stock-label low">Only ${p.quantity} left</div>` : '');
         return `
         <div class="product-card${!inStock ? ' out-of-stock' : ''}" data-id="${p.local_id}">
-          <div class="product-img">${categoryIcon(p.category)}</div>
+          <div class="product-img">${p.image_url
+            ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" loading="lazy"
+                 onerror="this.parentElement.textContent='${categoryIcon(p.category)}'">`
+            : categoryIcon(p.category)}</div>
           <div class="product-name">${escapeHtml(p.name)}</div>
           ${showPrices
             ? `<div class="product-price">${formatNaira(p.selling_price)}</div>`
