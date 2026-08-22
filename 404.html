@@ -597,17 +597,6 @@
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Please wait...';
 
-      // Open the destination window SYNCHRONOUSLY, before the await below —
-      // Chrome (confirmed via Chromium's own bug tracker) does not reliably
-      // propagate the "trusted user gesture" through a Promise/await chain,
-      // and wa.me links on Android trigger an app-intent handoff, not a
-      // plain page load — so calling window.location.href AFTER an await
-      // can be silently blocked in Chrome specifically, while working fine
-      // in Samsung Internet and others. Opening a blank window now, while
-      // still synchronously inside the click handler, keeps the gesture
-      // context alive; we just fill in its real URL once ready.
-      const waWindow = window.open('', '_blank');
-
       try {
         const res = await fetch(EDGE_FUNCTION_URL, {
           method: 'POST',
@@ -626,7 +615,6 @@
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-          if (waWindow) waWindow.close();
           errorEl.textContent = data.error || 'Could not create your order. Please try again.';
           errorEl.style.display = 'block';
           confirmBtn.disabled = false;
@@ -634,22 +622,22 @@
           return;
         }
 
-        if (waWindow) {
-          waWindow.location.href = data.whatsapp_url;
-        } else {
-          // Popup was blocked despite the synchronous open (rare, but
-          // possible on some browser configurations) — fall back to a
-          // same-tab redirect rather than leave the customer stuck.
-          window.location.href = data.whatsapp_url;
-        }
-        // Always reset button + close the modal on success, regardless of
-        // what happens in the new window/app-handoff — the ORIGINAL page
-        // must never be left showing a stuck "Please wait..." state.
+        // Direct, same-tab navigation — this is what correctly triggers
+        // Android's native "open in WhatsApp app" interception. An
+        // earlier fix tried pre-opening a blank window to work around a
+        // separate Chrome issue (navigation after an await sometimes
+        // being silently blocked) — but that broke the app-link handoff
+        // entirely, landing on WhatsApp's web fallback page instead of
+        // opening the app. The actual root cause of the original "stuck"
+        // bug wasn't a blocked navigation — it was that nothing ever
+        // reset the button on the success path at all. Fixed by doing
+        // that reset immediately and unconditionally, right here, not
+        // by changing how the navigation itself happens.
+        window.location.href = data.whatsapp_url;
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Continue to WhatsApp';
         document.getElementById('order-modal').classList.remove('visible');
       } catch (e) {
-        if (waWindow) waWindow.close();
         errorEl.textContent = 'Network error — please check your connection and try again.';
         errorEl.style.display = 'block';
         confirmBtn.disabled = false;
