@@ -342,7 +342,25 @@
       return res.json();
     }
 
+    // Cache successful loads in sessionStorage — repeat visits/refreshes
+    // within a browsing session skip the network round-trip entirely.
+    // Deliberately only caches a SUCCESSFUL (public, rendered) result —
+    // never the "not available" case, since a merchant could enable
+    // their storefront moments after a customer's first visit, and a
+    // stale "not available" shouldn't stick around for someone who
+    // just refreshes.
+    const STOREFRONT_CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes
+
     async function loadStorefront(bizId) {
+      const cacheKey = `tradizi_storefront_${bizId}`;
+      try {
+        const cached = JSON.parse(sessionStorage.getItem(cacheKey));
+        if (cached && (Date.now() - cached.fetchedAt) < STOREFRONT_CACHE_TTL_MS) {
+          renderStorefront(cached.business, cached.storefront, cached.visibleProducts);
+          return;
+        }
+      } catch (e) { /* malformed/missing cache entry — fetch fresh below */ }
+
       const [businesses, storefronts, products] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
@@ -362,6 +380,12 @@
 
       const disabledIds = storefront.disabled_product_ids || [];
       const visibleProducts = (products || []).filter(p => !disabledIds.includes(p.local_id));
+
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          business, storefront, visibleProducts, fetchedAt: Date.now(),
+        }));
+      } catch (e) { /* sessionStorage full/unavailable — safe to skip caching */ }
 
       renderStorefront(business, storefront, visibleProducts);
     }
