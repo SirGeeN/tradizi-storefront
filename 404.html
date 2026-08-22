@@ -176,7 +176,13 @@
     }
     .detail-section label { display: block; font-size: 11px; color: #9EAAB6; margin-bottom: 4px; }
     .detail-price { font-size: 22px; font-weight: 800; color: #1E7A4F; }
-    .detail-stock { font-size: 13px; color: #9EAAB6; margin-bottom: 16px; }
+    .detail-stock {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; margin-bottom: 16px;
+    }
+    .detail-stock svg { flex-shrink: 0; }
+    .detail-stock.in-stock { color: #10B981; }
+    .detail-stock.out-of-stock { color: #EF4444; }
     .detail-close {
       position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
       border-radius: 50%; border: none; background: #21262D; color: #E6EDF3;
@@ -548,7 +554,12 @@
             <label>Price</label>
             <div class="detail-price">${formatNaira(p.selling_price)}</div>
           </div>` : ''}
-        <div class="detail-stock">${stockText}</div>
+        <div class="detail-stock ${inStock ? 'in-stock' : 'out-of-stock'}">
+          ${inStock
+            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>`
+            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`}
+          <span>${stockText}</span>
+        </div>
         ${inStock
           ? `<button class="add-btn" onclick="addToCart('${p.local_id}'); document.getElementById('detail-modal').classList.remove('visible');">Add to Cart</button>`
           : `<button class="add-btn" disabled>Sold Out</button>`}
@@ -586,6 +597,17 @@
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Please wait...';
 
+      // Open the destination window SYNCHRONOUSLY, before the await below —
+      // Chrome (confirmed via Chromium's own bug tracker) does not reliably
+      // propagate the "trusted user gesture" through a Promise/await chain,
+      // and wa.me links on Android trigger an app-intent handoff, not a
+      // plain page load — so calling window.location.href AFTER an await
+      // can be silently blocked in Chrome specifically, while working fine
+      // in Samsung Internet and others. Opening a blank window now, while
+      // still synchronously inside the click handler, keeps the gesture
+      // context alive; we just fill in its real URL once ready.
+      const waWindow = window.open('', '_blank');
+
       try {
         const res = await fetch(EDGE_FUNCTION_URL, {
           method: 'POST',
@@ -604,6 +626,7 @@
         const data = await res.json();
 
         if (!res.ok || !data.success) {
+          if (waWindow) waWindow.close();
           errorEl.textContent = data.error || 'Could not create your order. Please try again.';
           errorEl.style.display = 'block';
           confirmBtn.disabled = false;
@@ -611,8 +634,22 @@
           return;
         }
 
-        window.location.href = data.whatsapp_url;
+        if (waWindow) {
+          waWindow.location.href = data.whatsapp_url;
+        } else {
+          // Popup was blocked despite the synchronous open (rare, but
+          // possible on some browser configurations) — fall back to a
+          // same-tab redirect rather than leave the customer stuck.
+          window.location.href = data.whatsapp_url;
+        }
+        // Always reset button + close the modal on success, regardless of
+        // what happens in the new window/app-handoff — the ORIGINAL page
+        // must never be left showing a stuck "Please wait..." state.
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Continue to WhatsApp';
+        document.getElementById('order-modal').classList.remove('visible');
       } catch (e) {
+        if (waWindow) waWindow.close();
         errorEl.textContent = 'Network error — please check your connection and try again.';
         errorEl.style.display = 'block';
         confirmBtn.disabled = false;
