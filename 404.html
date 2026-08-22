@@ -163,6 +163,26 @@
       width: 100%; max-width: 420px;
     }
     .modal h2 { font-size: 18px; margin-bottom: 16px; color: #E6EDF3; }
+    .detail-modal { max-height: 85vh; overflow-y: auto; }
+    .detail-modal .product-img { font-size: 60px; margin-bottom: 16px; }
+    .detail-category {
+      display: inline-block; background: #1E7A4F; color: #fff;
+      font-size: 11px; font-weight: 700; padding: 4px 10px;
+      border-radius: 20px; margin-bottom: 12px;
+    }
+    .detail-section {
+      background: #0D1117; border: 1px solid #30363D; border-radius: 10px;
+      padding: 12px; margin-bottom: 12px;
+    }
+    .detail-section label { display: block; font-size: 11px; color: #9EAAB6; margin-bottom: 4px; }
+    .detail-price { font-size: 22px; font-weight: 800; color: #1E7A4F; }
+    .detail-stock { font-size: 13px; color: #9EAAB6; margin-bottom: 16px; }
+    .detail-close {
+      position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
+      border-radius: 50%; border: none; background: #21262D; color: #E6EDF3;
+      font-size: 18px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center;
+    }
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 12px; color: #9EAAB6; margin-bottom: 6px; }
     .field input {
@@ -249,6 +269,13 @@
         <button class="btn-cancel" id="modal-cancel">Cancel</button>
         <button class="btn-confirm" id="modal-confirm">Continue to WhatsApp</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal detail-modal" style="position: relative;">
+      <button class="detail-close" id="detail-close">×</button>
+      <div id="detail-content"></div>
     </div>
   </div>
 
@@ -394,7 +421,7 @@
           : (p.quantity <= 5 ? `<div class="stock-label low">Only ${p.quantity} left</div>` : '');
         return `
         <div class="product-card${!inStock ? ' out-of-stock' : ''}" data-id="${p.local_id}">
-          <div class="product-img">${p.image_url
+          <div class="product-img" onclick="openProductDetail('${p.local_id}')">${p.image_url
             ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" loading="lazy"
                  onerror="this.parentElement.textContent='${categoryIcon(p.category)}'">`
             : categoryIcon(p.category)}</div>
@@ -493,6 +520,48 @@
     });
     document.getElementById('modal-cancel').addEventListener('click', () => {
       document.getElementById('order-modal').classList.remove('visible');
+    });
+
+    // ── Product detail view — tap a product's photo to see the full
+    // view (image, category, description, price, stock), matching
+    // the app's item_detail_screen.dart. Looks up from allProducts
+    // (already fetched) — no extra network request needed.
+    function openProductDetail(productId) {
+      const p = allProducts.find(x => x.local_id === productId);
+      if (!p) return;
+      const inStock = p.quantity > 0;
+      const stockText = !inStock ? 'Out of stock'
+        : `${p.quantity} unit${p.quantity === 1 ? '' : 's'} available`;
+      document.getElementById('detail-content').innerHTML = `
+        <div class="product-img">${p.image_url
+          ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}">`
+          : categoryIcon(p.category)}</div>
+        <h2 style="margin-bottom: 6px;">${escapeHtml(p.name)}</h2>
+        <span class="detail-category">${escapeHtml(p.category || 'Other')}</span>
+        ${p.description ? `
+          <div class="detail-section">
+            <label>About this product</label>
+            ${escapeHtml(p.description)}
+          </div>` : ''}
+        ${window._showPrices ? `
+          <div class="detail-section">
+            <label>Price</label>
+            <div class="detail-price">${formatNaira(p.selling_price)}</div>
+          </div>` : ''}
+        <div class="detail-stock">${stockText}</div>
+        ${inStock
+          ? `<button class="add-btn" onclick="addToCart('${p.local_id}'); document.getElementById('detail-modal').classList.remove('visible');">Add to Cart</button>`
+          : `<button class="add-btn" disabled>Sold Out</button>`}
+      `;
+      document.getElementById('detail-modal').classList.add('visible');
+    }
+    document.getElementById('detail-close').addEventListener('click', () => {
+      document.getElementById('detail-modal').classList.remove('visible');
+    });
+    document.getElementById('detail-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'detail-modal') {
+        document.getElementById('detail-modal').classList.remove('visible');
+      }
     });
 
     document.getElementById('modal-confirm').addEventListener('click', async () => {
