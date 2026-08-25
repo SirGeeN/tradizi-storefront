@@ -661,6 +661,17 @@
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Continue to WhatsApp';
         document.getElementById('order-modal').classList.remove('visible');
+
+        // Clear the cart on success — same fix already applied to the
+        // in-app version. Without this, a customer returning to the
+        // page (or simply not navigating away, since the WhatsApp
+        // handoff doesn't always unload this page) would still see
+        // their cart and an active "Order via WhatsApp" button for an
+        // order that was already sent — a real risk of accidentally
+        // creating a second, duplicate order for the same items.
+        Object.keys(cart).forEach(k => delete cart[k]);
+        renderFilteredProducts();
+        renderCartBar();
       } catch (e) {
         errorEl.textContent = 'Network error — please check your connection and try again.';
         errorEl.style.display = 'block';
