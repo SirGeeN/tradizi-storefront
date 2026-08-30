@@ -191,9 +191,24 @@
     }
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 12px; color: #9EAAB6; margin-bottom: 6px; }
-    .field input {
+    .field input, .field select {
       width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363D;
       background: #0D1117; color: #E6EDF3; font-size: 14px;
+    }
+    .zone-fallback {
+      font-size: 12px; color: #9EAAB6; margin-top: 6px;
+    }
+    .zone-fallback a { color: #25D366; text-decoration: none; }
+    .breakdown {
+      background: #0D1117; border: 1px solid #30363D; border-radius: 10px;
+      padding: 12px 14px; margin: 14px 0; font-size: 13px;
+    }
+    .breakdown-row {
+      display: flex; justify-content: space-between; padding: 3px 0; color: #9EAAB6;
+    }
+    .breakdown-row.total {
+      border-top: 1px solid #30363D; margin-top: 6px; padding-top: 8px;
+      color: #E6EDF3; font-weight: 700; font-size: 15px;
     }
     .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
     .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
@@ -274,6 +289,41 @@
       <div class="modal-actions">
         <button class="btn-cancel" id="modal-cancel">Cancel</button>
         <button class="btn-confirm" id="modal-confirm">Continue to WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="paynow-modal">
+    <div class="modal">
+      <h2>Pay Now</h2>
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="paynow-name" placeholder="e.g. Amaka Johnson">
+      </div>
+      <div class="field">
+        <label>Your Email</label>
+        <input type="email" id="paynow-email" placeholder="you@email.com">
+      </div>
+      <div class="field">
+        <label>WhatsApp Number (optional)</label>
+        <input type="tel" id="paynow-phone" placeholder="e.g. 08012345678">
+      </div>
+      <div class="field">
+        <label>Delivery Address</label>
+        <input type="text" id="paynow-address" placeholder="Street, area, landmark">
+      </div>
+      <div class="field" id="paynow-zone-field" style="display:none;">
+        <label>Delivery Area</label>
+        <select id="paynow-zone"></select>
+        <div class="zone-fallback" id="paynow-zone-fallback" style="display:none;">
+          Don't see your area? <a href="#" id="paynow-zone-whatsapp-link">Message the merchant on WhatsApp</a> to arrange delivery.
+        </div>
+      </div>
+      <div class="breakdown" id="paynow-breakdown"></div>
+      <p class="modal-error" id="paynow-error"></p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="paynow-cancel">Cancel</button>
+        <button class="btn-confirm" id="paynow-confirm">Pay Now</button>
       </div>
     </div>
   </div>
@@ -538,9 +588,196 @@
       document.getElementById('cart-count').textContent = `${count} item${count === 1 ? '' : 's'}`;
     }
 
-    // ── PAY NOW — stubbed until Paystack credentials are available ──
-    document.getElementById('pay-now-btn').addEventListener('click', () => {
-      alert('Online payment is coming very soon! For now, please use "Order via WhatsApp" to complete your purchase.');
+    // ── PAY NOW ───────────────────────────────────────────────────
+    // Mirrors calculateCheckout() in create-web-order-index.ts
+    // exactly — this is DISPLAY only, purely so the customer sees an
+    // accurate breakdown before committing. The server recalculates
+    // this same thing authoritatively when the order is actually
+    // created; this copy is never trusted for the real charge.
+    const PAYSTACK_PERCENT = 0.015;
+    const PAYSTACK_FLAT_FEE = 100;
+    const PAYSTACK_FEE_CAP = 2000;
+    const FLAT_FEE_WAIVED_BELOW = 2500;
+
+    function calculateCheckout(productSubtotal, deliveryFee, platformFeePercent, feeBearer) {
+      const tradiziCut = Math.round((platformFeePercent / 100) * productSubtotal * 100) / 100;
+      if (feeBearer === 'merchant') {
+        return { customerTotal: productSubtotal + deliveryFee, tradiziCut, paystackFee: 0 };
+      }
+      const baseline = productSubtotal + deliveryFee + tradiziCut;
+      const withFlatFee = (baseline + PAYSTACK_FLAT_FEE) / (1 - PAYSTACK_PERCENT);
+      const customerTotal = withFlatFee >= FLAT_FEE_WAIVED_BELOW
+        ? withFlatFee : baseline / (1 - PAYSTACK_PERCENT);
+      const paystackFee = Math.min(PAYSTACK_FEE_CAP, customerTotal - baseline);
+      return { customerTotal, tradiziCut, paystackFee };
+    }
+
+    let checkoutInfo = null; // fetched once per modal open
+
+    function currentProductSubtotal() {
+      return Object.values(cart).reduce((sum, e) => sum + e.product.selling_price * e.quantity, 0);
+    }
+
+    function currentDeliveryFee() {
+      if (!checkoutInfo || checkoutInfo.deliveryZones.length === 0) return 0;
+      const zoneId = document.getElementById('paynow-zone').value;
+      const zone = checkoutInfo.deliveryZones.find(z => z.id === zoneId);
+      return zone ? Number(zone.fee) || 0 : 0;
+    }
+
+    function renderBreakdown() {
+      if (!checkoutInfo) return;
+      const productSubtotal = currentProductSubtotal();
+      const deliveryFee = currentDeliveryFee();
+      const result = calculateCheckout(
+        productSubtotal, deliveryFee, checkoutInfo.platformFeePercent, checkoutInfo.feeBearer,
+      );
+      const rows = [
+        ['Products', formatNaira(productSubtotal)],
+        ['Delivery', deliveryFee === 0 ? 'Free' : formatNaira(deliveryFee)],
+      ];
+      if (checkoutInfo.feeBearer === 'customer' && result.paystackFee > 0) {
+        rows.push(['Processing fee', formatNaira(result.paystackFee)]);
+      }
+      document.getElementById('paynow-breakdown').innerHTML =
+        rows.map(([label, val]) => `<div class="breakdown-row"><span>${label}</span><span>${val}</span></div>`).join('') +
+        `<div class="breakdown-row total"><span>Total</span><span>${formatNaira(result.customerTotal)}</span></div>`;
+    }
+
+    async function openPaynowModal() {
+      const bizId = path.split('/shop/')[1];
+      const errorEl = document.getElementById('paynow-error');
+      errorEl.style.display = 'none';
+
+      try {
+        const res = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ action: 'getCheckoutInfo', business_id: bizId }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Could not load checkout info');
+        checkoutInfo = data;
+      } catch (e) {
+        alert('Could not start checkout — please try again, or use "Order via WhatsApp" instead.');
+        return;
+      }
+
+      if (!checkoutInfo.payNowAvailable) {
+        alert('This merchant hasn\'t set up online payments yet. Please use "Order via WhatsApp" to complete your purchase.');
+        return;
+      }
+
+      const zoneField = document.getElementById('paynow-zone-field');
+      const zoneSelect = document.getElementById('paynow-zone');
+      const zoneFallback = document.getElementById('paynow-zone-fallback');
+      if (checkoutInfo.deliveryZones.length > 0) {
+        zoneSelect.innerHTML = checkoutInfo.deliveryZones
+          .map(z => `<option value="${z.id}">${escapeHtml(z.zone_name)} — ${Number(z.fee) === 0 ? 'Free' : formatNaira(z.fee)}</option>`)
+          .join('');
+        zoneField.style.display = 'block';
+        zoneFallback.style.display = 'block';
+      } else {
+        zoneField.style.display = 'none';
+      }
+
+      renderBreakdown();
+      document.getElementById('paynow-modal').classList.add('visible');
+    }
+
+    document.getElementById('pay-now-btn').addEventListener('click', openPaynowModal);
+    document.getElementById('paynow-cancel').addEventListener('click', () => {
+      document.getElementById('paynow-modal').classList.remove('visible');
+    });
+    document.getElementById('paynow-zone').addEventListener('change', renderBreakdown);
+
+    // Reuses the existing, already-working WhatsApp order flow
+    // entirely, rather than building a separate delivery-negotiation
+    // mechanism for what should be a genuine edge case.
+    document.getElementById('paynow-zone-whatsapp-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('paynow-modal').classList.remove('visible');
+      document.getElementById('modal-error').style.display = 'none';
+      document.getElementById('order-modal').classList.add('visible');
+    });
+
+    document.getElementById('paynow-confirm').addEventListener('click', async () => {
+      const name = document.getElementById('paynow-name').value.trim();
+      const email = document.getElementById('paynow-email').value.trim();
+      const phone = document.getElementById('paynow-phone').value.trim();
+      const address = document.getElementById('paynow-address').value.trim();
+      const zoneId = checkoutInfo.deliveryZones.length > 0
+        ? document.getElementById('paynow-zone').value : null;
+      const errorEl = document.getElementById('paynow-error');
+      errorEl.style.display = 'none';
+
+      if (!name) {
+        errorEl.textContent = 'Please enter your name.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        errorEl.textContent = 'Please enter a valid email — this is where your receipt will be sent.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!address) {
+        errorEl.textContent = 'Please enter your delivery address.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const bizId = path.split('/shop/')[1];
+      const items = Object.entries(cart).map(([productId, entry]) => ({
+        product_id: productId,
+        quantity: entry.quantity,
+      }));
+
+      const confirmBtn = document.getElementById('paynow-confirm');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Please wait...';
+
+      try {
+        const res = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            business_id: bizId,
+            customer_name: name,
+            customer_email: email,
+            customer_phone: phone || null,
+            delivery_address: address,
+            delivery_zone_id: zoneId,
+            items,
+            payment_method: 'paystack',
+          }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          errorEl.textContent = data.error || 'Could not start payment. Please try again.';
+          errorEl.style.display = 'block';
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Pay Now';
+          return;
+        }
+
+        // Same-tab redirect to Paystack's own checkout page.
+        window.location.href = data.checkout_url;
+      } catch (e) {
+        errorEl.textContent = 'Something went wrong. Please try again.';
+        errorEl.style.display = 'block';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Pay Now';
+      }
     });
 
     // ── Order via WhatsApp ──────────────────────────────────────
