@@ -605,10 +605,16 @@
         return { customerTotal: productSubtotal + deliveryFee, tradiziCut, paystackFee: 0 };
       }
       const baseline = productSubtotal + deliveryFee + tradiziCut;
-      const withFlatFee = (baseline + PAYSTACK_FLAT_FEE) / (1 - PAYSTACK_PERCENT);
-      const customerTotal = withFlatFee >= FLAT_FEE_WAIVED_BELOW
-        ? withFlatFee : baseline / (1 - PAYSTACK_PERCENT);
-      const paystackFee = Math.min(PAYSTACK_FEE_CAP, customerTotal - baseline);
+      const uncappedWithFlat = (baseline + PAYSTACK_FLAT_FEE) / (1 - PAYSTACK_PERCENT);
+      const uncappedTotal = uncappedWithFlat >= FLAT_FEE_WAIVED_BELOW
+        ? uncappedWithFlat : baseline / (1 - PAYSTACK_PERCENT);
+      const uncappedFee = uncappedTotal - baseline;
+      // Fixed: previously computed customerTotal using the uncapped
+      // fee, then only capped the FEE shown for display — the two
+      // must be capped together, consistently, or the total silently
+      // includes money the breakdown never accounts for.
+      const paystackFee = uncappedFee > PAYSTACK_FEE_CAP ? PAYSTACK_FEE_CAP : uncappedFee;
+      const customerTotal = uncappedFee > PAYSTACK_FEE_CAP ? baseline + PAYSTACK_FEE_CAP : uncappedTotal;
       return { customerTotal, tradiziCut, paystackFee };
     }
 
@@ -636,6 +642,16 @@
         ['Products', formatNaira(productSubtotal)],
         ['Delivery', deliveryFee === 0 ? 'Free' : formatNaira(deliveryFee)],
       ];
+      // Always shown when non-zero, labeled by who actually covers
+      // it — previously this was silently invisible whenever the
+      // merchant absorbed it, which wasn't a deliberate transparency
+      // choice, just an unaddressed gap.
+      if (result.tradiziCut > 0) {
+        rows.push([
+          checkoutInfo.feeBearer === 'customer' ? 'Platform fee' : 'Platform fee (covered by merchant)',
+          formatNaira(result.tradiziCut),
+        ]);
+      }
       if (checkoutInfo.feeBearer === 'customer' && result.paystackFee > 0) {
         rows.push(['Processing fee', formatNaira(result.paystackFee)]);
       }
