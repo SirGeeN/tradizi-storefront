@@ -295,7 +295,10 @@
 
   <div class="modal-overlay" id="paynow-modal">
     <div class="modal">
-      <h2>Pay Now</h2>
+      <h2>Checkout</h2>
+      <p id="paynow-item-count" style="font-size:12px;color:#9EAAB6;margin:-8px 0 12px;"></p>
+      <div id="paynow-items"></div>
+      <hr style="border:none;border-top:1px solid #30363D;margin:16px 0;">
       <div class="field">
         <label>Your Name</label>
         <input type="text" id="paynow-name" placeholder="e.g. Amaka Johnson">
@@ -651,6 +654,45 @@
       return zone ? Number(zone.fee) || 0 : 0;
     }
 
+    // ── Checkout item review — the missing step: seeing and
+    // adjusting exactly what's being bought before being asked to
+    // pay, matching standard cart → checkout convention (Amazon,
+    // Shopify stores, etc.) rather than jumping straight from "add
+    // item" to a payment form.
+    function renderPaynowItems() {
+      const items = Object.entries(cart);
+      const count = items.reduce((sum, [, i]) => sum + i.quantity, 0);
+      document.getElementById('paynow-item-count').textContent =
+        `${count} item${count === 1 ? '' : 's'} in your cart`;
+      document.getElementById('paynow-items').innerHTML = items.map(([id, entry]) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.product.name)}</div>
+            <div style="font-size:12px;color:#9EAAB6;">${formatNaira(entry.product.selling_price)}</div>
+          </div>
+          <button class="qty-btn" onclick="changeQtyInModal('${id}', -1)">−</button>
+          <span class="qty-value">${entry.quantity}</span>
+          <button class="qty-btn" onclick="changeQtyInModal('${id}', 1)">+</button>
+        </div>
+      `).join('');
+    }
+
+    // Reuses window.changeQty's own, already-proven logic (stock
+    // limits, auto-delete at zero) rather than duplicating it —
+    // additionally keeps the open modal's own item list and
+    // breakdown in sync, which changeQty alone only updates the main
+    // grid for.
+    window.changeQtyInModal = function(productId, delta) {
+      window.changeQty(productId, delta);
+      if (Object.keys(cart).length === 0) {
+        // Nothing left to check out — close rather than show an empty modal.
+        document.getElementById('paynow-modal').classList.remove('visible');
+        return;
+      }
+      renderPaynowItems();
+      renderBreakdown();
+    };
+
     function renderBreakdown() {
       if (!checkoutInfo) return;
       const productSubtotal = currentProductSubtotal();
@@ -665,16 +707,17 @@
       // Presentation only — combines platform fee + processing fee
       // into one "Fees" line rather than two separate ones. The
       // underlying calculation is unchanged; this is purely how the
-      // same numbers get displayed. Exact in both modes, not an
-      // estimate — Paystack's own fee formula (1.5% + ₦100, capped at
-      // ₦2,000, waived under ₦2,500) is public and deterministic, and
-      // customerTotal is always a fixed, known value going into it —
-      // nothing genuinely uncertain to hedge here.
+      // same numbers get displayed. In "customer covers it" mode this
+      // is the actual, confirmed figure Paystack will charge — in
+      // "merchant covers it" mode it's an honest estimate (Paystack
+      // confirms the real fee only at charge time), marked with ~
+      // accordingly rather than presented as an exact guarantee.
       const totalFees = result.tradiziCut + result.paystackFee;
       if (totalFees > 0) {
+        const isEstimate = checkoutInfo.feeBearer === 'merchant';
         rows.push([
-          checkoutInfo.feeBearer === 'customer' ? 'Fees' : 'Fees (covered by merchant)',
-          formatNaira(totalFees),
+          isEstimate ? 'Fees (covered by merchant, est.)' : 'Fees',
+          `${isEstimate ? '~' : ''}${formatNaira(totalFees)}`,
         ]);
       }
       document.getElementById('paynow-breakdown').innerHTML =
@@ -731,6 +774,7 @@
         zoneField.style.display = 'none';
       }
 
+      renderPaynowItems();
       renderBreakdown();
       document.getElementById('paynow-modal').classList.add('visible');
 
