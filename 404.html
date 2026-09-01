@@ -160,7 +160,7 @@
     .modal-overlay.visible { display: flex; }
     .modal {
       background: #161B22; border-radius: 20px 20px 0 0; padding: 24px 20px;
-      width: 100%; max-width: 420px;
+      width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto;
     }
     .modal h2 { font-size: 18px; margin-bottom: 16px; color: #E6EDF3; }
     .detail-modal { max-height: 85vh; overflow-y: auto; }
@@ -665,13 +665,13 @@
       document.getElementById('paynow-item-count').textContent =
         `${count} item${count === 1 ? '' : 's'} in your cart`;
       document.getElementById('paynow-items').innerHTML = items.map(([id, entry]) => `
-        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;color:#E6EDF3;">
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.product.name)}</div>
+            <div style="font-weight:600;font-size:14px;color:#E6EDF3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.product.name)}</div>
             <div style="font-size:12px;color:#9EAAB6;">${formatNaira(entry.product.selling_price)}</div>
           </div>
           <button class="qty-btn" onclick="changeQtyInModal('${id}', -1)">−</button>
-          <span class="qty-value">${entry.quantity}</span>
+          <span class="qty-value" style="color:#E6EDF3;">${entry.quantity}</span>
           <button class="qty-btn" onclick="changeQtyInModal('${id}', 1)">+</button>
         </div>
       `).join('');
@@ -777,6 +777,14 @@
       renderPaynowItems();
       renderBreakdown();
       document.getElementById('paynow-modal').classList.add('visible');
+      // .modal now has its own explicit scroll container (max-height +
+      // overflow-y: auto) — reset it directly, rather than the page's
+      // own scroll, which position: fixed made an unreliable target.
+      // Without this, reopening the modal could keep whatever scroll
+      // position was left over from a previous interaction, hiding
+      // the heading and first items above the fold until manually
+      // scrolled up.
+      document.querySelector('#paynow-modal .modal').scrollTop = 0;
 
       // Reset here too, not just on failure — the modal is now open,
       // but this same button remains in the page underneath it and
