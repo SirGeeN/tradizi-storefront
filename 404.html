@@ -609,7 +609,20 @@
         platformFeeCap,
       );
       if (feeBearer === 'merchant') {
-        return { customerTotal: productSubtotal + deliveryFee, tradiziCut, paystackFee: 0 };
+        // Estimated only — matches create-web-order-index.ts exactly.
+        // The actual fee is confirmed by Paystack itself at charge
+        // time, not guaranteed here — this exists purely so "Fees
+        // (covered by merchant)" can show an accurate, honest figure
+        // to the customer instead of silently omitting Paystack's
+        // share of what the merchant actually absorbs.
+        const customerTotal = productSubtotal + deliveryFee;
+        const paystackFee = Math.min(
+          PAYSTACK_FEE_CAP,
+          customerTotal < FLAT_FEE_WAIVED_BELOW
+            ? customerTotal * PAYSTACK_PERCENT
+            : customerTotal * PAYSTACK_PERCENT + PAYSTACK_FLAT_FEE,
+        );
+        return { customerTotal, tradiziCut, paystackFee };
       }
       const baseline = productSubtotal + deliveryFee + tradiziCut;
       const uncappedWithFlat = (baseline + PAYSTACK_FLAT_FEE) / (1 - PAYSTACK_PERCENT);
@@ -651,16 +664,18 @@
       ];
       // Presentation only — combines platform fee + processing fee
       // into one "Fees" line rather than two separate ones. The
-      // underlying calculation is completely unchanged: this is
-      // purely how the same two numbers get displayed, not a change
-      // to what's actually charged. Naturally handles Choice A too
-      // without any special-casing, since paystackFee is always 0
-      // there — the sum just equals tradiziCut in that case.
+      // underlying calculation is unchanged; this is purely how the
+      // same numbers get displayed. In "customer covers it" mode this
+      // is the actual, confirmed figure Paystack will charge — in
+      // "merchant covers it" mode it's an honest estimate (Paystack
+      // confirms the real fee only at charge time), marked with ~
+      // accordingly rather than presented as an exact guarantee.
       const totalFees = result.tradiziCut + result.paystackFee;
       if (totalFees > 0) {
+        const isEstimate = checkoutInfo.feeBearer === 'merchant';
         rows.push([
-          checkoutInfo.feeBearer === 'customer' ? 'Fees' : 'Fees (covered by merchant)',
-          formatNaira(totalFees),
+          isEstimate ? 'Fees (covered by merchant, est.)' : 'Fees',
+          `${isEstimate ? '~' : ''}${formatNaira(totalFees)}`,
         ]);
       }
       document.getElementById('paynow-breakdown').innerHTML =
