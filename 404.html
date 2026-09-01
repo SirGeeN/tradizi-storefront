@@ -665,17 +665,16 @@
       // Presentation only — combines platform fee + processing fee
       // into one "Fees" line rather than two separate ones. The
       // underlying calculation is unchanged; this is purely how the
-      // same numbers get displayed. In "customer covers it" mode this
-      // is the actual, confirmed figure Paystack will charge — in
-      // "merchant covers it" mode it's an honest estimate (Paystack
-      // confirms the real fee only at charge time), marked with ~
-      // accordingly rather than presented as an exact guarantee.
+      // same numbers get displayed. Exact in both modes, not an
+      // estimate — Paystack's own fee formula (1.5% + ₦100, capped at
+      // ₦2,000, waived under ₦2,500) is public and deterministic, and
+      // customerTotal is always a fixed, known value going into it —
+      // nothing genuinely uncertain to hedge here.
       const totalFees = result.tradiziCut + result.paystackFee;
       if (totalFees > 0) {
-        const isEstimate = checkoutInfo.feeBearer === 'merchant';
         rows.push([
-          isEstimate ? 'Fees (covered by merchant, est.)' : 'Fees',
-          `${isEstimate ? '~' : ''}${formatNaira(totalFees)}`,
+          checkoutInfo.feeBearer === 'customer' ? 'Fees' : 'Fees (covered by merchant)',
+          formatNaira(totalFees),
         ]);
       }
       document.getElementById('paynow-breakdown').innerHTML =
