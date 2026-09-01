@@ -687,6 +687,10 @@
       const errorEl = document.getElementById('paynow-error');
       errorEl.style.display = 'none';
 
+      const openBtn = document.getElementById('pay-now-btn');
+      openBtn.disabled = true;
+      openBtn.textContent = 'Please wait...';
+
       try {
         const res = await fetch(EDGE_FUNCTION_URL, {
           method: 'POST',
@@ -702,11 +706,15 @@
         checkoutInfo = data;
       } catch (e) {
         alert('Could not start checkout — please try again, or use "Order via WhatsApp" instead.');
+        openBtn.disabled = false;
+        openBtn.textContent = 'Pay Now';
         return;
       }
 
       if (!checkoutInfo.payNowAvailable) {
         alert('This merchant hasn\'t set up online payments yet. Please use "Order via WhatsApp" to complete your purchase.');
+        openBtn.disabled = false;
+        openBtn.textContent = 'Pay Now';
         return;
       }
 
@@ -725,6 +733,13 @@
 
       renderBreakdown();
       document.getElementById('paynow-modal').classList.add('visible');
+
+      // Reset here too, not just on failure — the modal is now open,
+      // but this same button remains in the page underneath it and
+      // needs to be back to normal if the customer ever returns to it
+      // (e.g. cancels the modal and taps Pay Now again).
+      openBtn.disabled = false;
+      openBtn.textContent = 'Pay Now';
     }
 
     document.getElementById('pay-now-btn').addEventListener('click', openPaynowModal);
