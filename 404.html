@@ -649,18 +649,19 @@
         ['Products', formatNaira(productSubtotal)],
         ['Delivery', deliveryFee === 0 ? 'Free' : formatNaira(deliveryFee)],
       ];
-      // Always shown when non-zero, labeled by who actually covers
-      // it — previously this was silently invisible whenever the
-      // merchant absorbed it, which wasn't a deliberate transparency
-      // choice, just an unaddressed gap.
-      if (result.tradiziCut > 0) {
+      // Presentation only — combines platform fee + processing fee
+      // into one "Fees" line rather than two separate ones. The
+      // underlying calculation is completely unchanged: this is
+      // purely how the same two numbers get displayed, not a change
+      // to what's actually charged. Naturally handles Choice A too
+      // without any special-casing, since paystackFee is always 0
+      // there — the sum just equals tradiziCut in that case.
+      const totalFees = result.tradiziCut + result.paystackFee;
+      if (totalFees > 0) {
         rows.push([
-          checkoutInfo.feeBearer === 'customer' ? 'Platform fee' : 'Platform fee (covered by merchant)',
-          formatNaira(result.tradiziCut),
+          checkoutInfo.feeBearer === 'customer' ? 'Fees' : 'Fees (covered by merchant)',
+          formatNaira(totalFees),
         ]);
-      }
-      if (checkoutInfo.feeBearer === 'customer' && result.paystackFee > 0) {
-        rows.push(['Processing fee', formatNaira(result.paystackFee)]);
       }
       document.getElementById('paynow-breakdown').innerHTML =
         rows.map(([label, val]) => `<div class="breakdown-row"><span>${label}</span><span>${val}</span></div>`).join('') +
