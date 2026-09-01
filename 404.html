@@ -125,7 +125,7 @@
       background: #21262D; color: #E6EDF3; font-size: 16px; font-weight: 700;
       cursor: pointer;
     }
-    .qty-value { font-size: 14px; font-weight: 700; min-width: 24px; text-align: center; }
+    .qty-value { font-size: 16px; font-weight: 700; min-width: 24px; text-align: center; }
     .add-btn {
       width: 100%; padding: 8px; border-radius: 8px; border: none;
       background: #1E7A4F; color: #fff; font-size: 13px; font-weight: 700;
@@ -162,7 +162,7 @@
       background: #161B22; border-radius: 20px 20px 0 0; padding: 24px 20px;
       width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto;
     }
-    .modal h2 { font-size: 18px; margin-bottom: 16px; color: #E6EDF3; }
+    .modal h2 { font-size: 21px; margin-bottom: 16px; color: #E6EDF3; }
     .detail-modal { max-height: 85vh; overflow-y: auto; }
     .detail-modal .product-img { font-size: 60px; margin-bottom: 16px; }
     .detail-category {
@@ -190,31 +190,31 @@
       justify-content: center;
     }
     .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 12px; color: #C9D1D9; margin-bottom: 6px; }
+    .field label { display: block; font-size: 14px; color: #C9D1D9; margin-bottom: 6px; }
     .field input, .field select {
       width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #30363D;
-      background: #0D1117; color: #E6EDF3; font-size: 14px;
+      background: #0D1117; color: #E6EDF3; font-size: 16px;
     }
     .zone-fallback {
-      font-size: 12px; color: #C9D1D9; margin-top: 6px;
+      font-size: 14px; color: #C9D1D9; margin-top: 6px;
     }
     .zone-fallback a { color: #25D366; text-decoration: none; }
     .breakdown {
       background: #0D1117; border: 1px solid #30363D; border-radius: 10px;
-      padding: 12px 14px; margin: 14px 0; font-size: 13px;
+      padding: 12px 14px; margin: 14px 0; font-size: 15px;
     }
     .breakdown-row {
-      display: flex; justify-content: space-between; padding: 3px 0; color: #C9D1D9;
+      display: flex; justify-content: space-between; padding: 4px 0; color: #C9D1D9;
     }
     .breakdown-row.total {
       border-top: 1px solid #30363D; margin-top: 6px; padding-top: 8px;
-      color: #E6EDF3; font-weight: 700; font-size: 15px;
+      color: #E6EDF3; font-weight: 700; font-size: 17px;
     }
     .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
-    .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+    .modal-actions button { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 700; font-size: 16px; cursor: pointer; }
     .btn-cancel { background: #21262D; color: #C9D1D9; }
     .btn-confirm { background: #25D366; color: #0D1117; }
-    .modal-error { color: #F85149; font-size: 13px; margin-top: 8px; display: none; }
+    .modal-error { color: #F85149; font-size: 14px; margin-top: 8px; display: none; }
   </style>
 </head>
 <body>
@@ -296,7 +296,7 @@
   <div class="modal-overlay" id="paynow-modal">
     <div class="modal">
       <h2>Checkout</h2>
-      <p id="paynow-item-count" style="font-size:12px;color:#C9D1D9;margin:-8px 0 12px;"></p>
+      <p id="paynow-item-count" style="font-size:14px;color:#C9D1D9;margin:-8px 0 12px;"></p>
       <div id="paynow-items"></div>
       <hr style="border:none;border-top:1px solid #30363D;margin:16px 0;">
       <div class="field">
@@ -667,8 +667,8 @@
       document.getElementById('paynow-items').innerHTML = items.map(([id, entry]) => `
         <div style="display:flex;align-items:center;gap:10px;padding:6px 0;color:#E6EDF3;">
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;font-size:14px;color:#E6EDF3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.product.name)}</div>
-            <div style="font-size:12px;color:#C9D1D9;">${formatNaira(entry.product.selling_price)}</div>
+            <div style="font-weight:600;font-size:16px;color:#E6EDF3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.product.name)}</div>
+            <div style="font-size:14px;color:#C9D1D9;">${formatNaira(entry.product.selling_price)}</div>
           </div>
           <button class="qty-btn" onclick="changeQtyInModal('${id}', -1)">−</button>
           <span class="qty-value" style="color:#E6EDF3;">${entry.quantity}</span>
