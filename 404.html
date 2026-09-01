@@ -599,8 +599,15 @@
     const PAYSTACK_FEE_CAP = 2000;
     const FLAT_FEE_WAIVED_BELOW = 2500;
 
-    function calculateCheckout(productSubtotal, deliveryFee, platformFeePercent, feeBearer) {
-      const tradiziCut = Math.round((platformFeePercent / 100) * productSubtotal * 100) / 100;
+    function calculateCheckout(productSubtotal, deliveryFee, platformFeePercent, platformFeeCap, feeBearer) {
+      // Same cap logic as create-web-order-index.ts — must match
+      // exactly, since this is purely a preview; the server
+      // recalculates authoritatively when the order is actually
+      // created.
+      const tradiziCut = Math.min(
+        Math.round((platformFeePercent / 100) * productSubtotal * 100) / 100,
+        platformFeeCap,
+      );
       if (feeBearer === 'merchant') {
         return { customerTotal: productSubtotal + deliveryFee, tradiziCut, paystackFee: 0 };
       }
@@ -636,7 +643,7 @@
       const productSubtotal = currentProductSubtotal();
       const deliveryFee = currentDeliveryFee();
       const result = calculateCheckout(
-        productSubtotal, deliveryFee, checkoutInfo.platformFeePercent, checkoutInfo.feeBearer,
+        productSubtotal, deliveryFee, checkoutInfo.platformFeePercent, checkoutInfo.platformFeeCap, checkoutInfo.feeBearer,
       );
       const rows = [
         ['Products', formatNaira(productSubtotal)],
