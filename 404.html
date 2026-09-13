@@ -316,6 +316,10 @@
         <label>Delivery Address *</label>
         <input type="text" id="paynow-address" placeholder="Street, area, landmark">
       </div>
+      <div class="field">
+        <label>Preferred Delivery Time (optional)</label>
+        <input type="datetime-local" id="paynow-delivery-time">
+      </div>
       <div class="field" id="paynow-zone-field" style="display:none;">
         <label>Delivery Area</label>
         <select id="paynow-zone"></select>
@@ -816,6 +820,12 @@
       const email = document.getElementById('paynow-email').value.trim();
       const phone = document.getElementById('paynow-phone').value.trim();
       const address = document.getElementById('paynow-address').value.trim();
+      const deliveryTimeRaw = document.getElementById('paynow-delivery-time').value;
+      // datetime-local gives 'YYYY-MM-DDTHH:mm' with no timezone —
+      // treated as the customer's own local time, converted to a real
+      // ISO string (with offset) here so the backend receives an
+      // unambiguous instant, not a bare local-looking string.
+      const deliveryTime = deliveryTimeRaw ? new Date(deliveryTimeRaw).toISOString() : null;
       const zoneId = checkoutInfo.deliveryZones.length > 0
         ? document.getElementById('paynow-zone').value : null;
       const errorEl = document.getElementById('paynow-error');
@@ -861,6 +871,7 @@
             customer_email: email,
             customer_phone: phone || null,
             delivery_address: address,
+            delivery_time: deliveryTime,
             delivery_zone_id: zoneId,
             items,
             payment_method: 'paystack',
