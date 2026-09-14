@@ -402,13 +402,19 @@
       return '₦' + Number(amount).toLocaleString('en-NG');
     }
 
-    let toastTimer = null;
+    let dismissToastHandler = null;
     function showToast(message) {
       const el = document.getElementById('toast');
       document.getElementById('toast-text').textContent = message;
       el.classList.add('visible');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('visible'), 1600);
+
+      if (dismissToastHandler) document.removeEventListener('click', dismissToastHandler);
+      dismissToastHandler = () => el.classList.remove('visible');
+      // Deferred to the next tick so the very click that triggered this
+      // toast (Add to Cart / Add) doesn't immediately dismiss it too —
+      // by the time this fires, that click has already fully finished
+      // dispatching.
+      setTimeout(() => document.addEventListener('click', dismissToastHandler, { once: true }), 0);
     }
 
     // Matches ProductVariant.label in product_variant_models.dart and
