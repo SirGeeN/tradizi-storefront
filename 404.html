@@ -355,7 +355,7 @@
     const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.tradeeasy.ng';
 
     const path = window.location.pathname;
-    const cart = {}; // productId -> { product, quantity }
+    const cart = {}; // cartKey (variantId, or productId when no variant) -> { product, quantity, productId, variantId }
     let allProducts = [];   // full fetched list, unfiltered
     let activeCategory = 'All';
     let searchQuery = '';
@@ -380,6 +380,13 @@
 
     function formatNaira(amount) {
       return '₦' + Number(amount).toLocaleString('en-NG');
+    }
+
+    // Matches ProductVariant.label in product_variant_models.dart and
+    // variantLabel() in create-web-order.ts — "Size: M, Color: Red" —
+    // same format everywhere this shows.
+    function variantLabel(optionValues) {
+      return Object.entries(optionValues || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
     }
 
     function show(id) {
@@ -414,15 +421,16 @@
       try {
         const cached = JSON.parse(sessionStorage.getItem(cacheKey));
         if (cached && (Date.now() - cached.fetchedAt) < STOREFRONT_CACHE_TTL_MS) {
-          renderStorefront(cached.business, cached.storefront, cached.visibleProducts);
+          renderStorefront(cached.business, cached.storefront, cached.visibleProducts, cached.allVariants || []);
           return;
         }
       } catch (e) { /* malformed/missing cache entry — fetch fresh below */ }
 
-      const [businesses, storefronts, products] = await Promise.all([
+      const [businesses, storefronts, products, variants] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
-        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category,image_url`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category,image_url,has_variants`),
+        sbFetch('product_variants', `?business_id=eq.${bizId}&is_deleted=eq.false&select=id,product_id,option_values,sku,quantity,buying_price,selling_price,image_url`),
       ]);
 
       const business = businesses && businesses[0];
@@ -438,17 +446,18 @@
 
       const disabledIds = storefront.disabled_product_ids || [];
       const visibleProducts = (products || []).filter(p => !disabledIds.includes(p.local_id));
+      const allVariants = variants || [];
 
       try {
         sessionStorage.setItem(cacheKey, JSON.stringify({
-          business, storefront, visibleProducts, fetchedAt: Date.now(),
+          business, storefront, visibleProducts, allVariants, fetchedAt: Date.now(),
         }));
       } catch (e) { /* sessionStorage full/unavailable — safe to skip caching */ }
 
-      renderStorefront(business, storefront, visibleProducts);
+      renderStorefront(business, storefront, visibleProducts, allVariants);
     }
 
-    function renderStorefront(business, storefront, products) {
+    function renderStorefront(business, storefront, products, variants) {
       hide('loading');
       document.getElementById('biz-name').textContent = business.business_name || 'TRADIZI Store';
       show('storefront');
@@ -456,6 +465,13 @@
       allProducts = products;
       window._products = Object.fromEntries(products.map(p => [p.local_id, p]));
       window._showPrices = storefront.show_prices !== false;
+
+      // Variants grouped by product_id — a plain product simply has
+      // no entry here, so every lookup below degrades gracefully.
+      window._variants = {};
+      for (const v of variants) {
+        (window._variants[v.product_id] ||= []).push(v);
+      }
 
       renderCategoryChips();
       renderFilteredProducts();
@@ -503,10 +519,26 @@
       emptyEl.style.display = 'none';
 
       grid.innerHTML = products.map(p => {
-        const inStock = Number(p.quantity) > 0;
+        const variantList = (window._variants && window._variants[p.local_id]) || [];
+        const isVariant = !!p.has_variants && variantList.length > 0;
+
+        // For a variant product, stock and price aren't single numbers
+        // — stock is the sum across every option combination, and
+        // price is "From ₦X" (the cheapest combination), deferring
+        // the real choice to the detail view, same as the app itself
+        // treats a hasVariants product's own quantity/price as purely
+        // informational (see product_variant_models.dart).
+        const totalQty = isVariant
+          ? variantList.reduce((sum, v) => sum + (Number(v.quantity) || 0), 0)
+          : Number(p.quantity) || 0;
+        const minPrice = isVariant
+          ? Math.min(...variantList.map(v => Number(v.selling_price ?? p.selling_price) || 0))
+          : Number(p.selling_price) || 0;
+
+        const inStock = totalQty > 0;
         const stockLabel = !inStock
           ? '<div class="stock-label out">Out of stock</div>'
-          : (p.quantity <= 5 ? `<div class="stock-label low">Only ${p.quantity} left</div>` : '');
+          : (totalQty <= 5 ? `<div class="stock-label low">Only ${totalQty} left</div>` : '');
         return `
         <div class="product-card${!inStock ? ' out-of-stock' : ''}" data-id="${p.local_id}">
           <div class="product-img" onclick="openProductDetail('${p.local_id}')">${p.image_url
@@ -515,20 +547,31 @@
             : categoryIcon(p.category)}</div>
           <div class="product-name">${escapeHtml(p.name)}</div>
           ${showPrices
-            ? `<div class="product-price">${formatNaira(p.selling_price)}</div>`
+            ? `<div class="product-price">${isVariant ? 'From ' : ''}${formatNaira(minPrice)}</div>`
             : ''}
           ${stockLabel}
           <div class="qty-row" id="qty-row-${p.local_id}">
-            ${inStock
-              ? `<button class="add-btn" onclick="addToCart('${p.local_id}')">Add</button>`
-              : `<button class="add-btn" disabled>Sold Out</button>`}
+            ${isVariant
+              ? (inStock
+                  ? `<button class="add-btn" onclick="openProductDetail('${p.local_id}')">See Options</button>`
+                  : `<button class="add-btn" disabled>Sold Out</button>`)
+              : (inStock
+                  ? `<button class="add-btn" onclick="addToCart('${p.local_id}')">Add</button>`
+                  : `<button class="add-btn" disabled>Sold Out</button>`)}
           </div>
         </div>
       `;
       }).join('');
 
-      // Re-apply any existing cart quantities to the freshly rendered rows
-      Object.keys(cart).forEach(renderQtyRow);
+      // Re-apply any existing cart quantities to the freshly rendered
+      // rows — plain products only; a variant product's card has no
+      // qty stepper of its own (the row it shows is keyed by the
+      // parent product id, not any variant's cart key, so it would
+      // never match a variant cart entry here anyway).
+      Object.keys(cart).forEach(key => {
+        const entry = cart[key];
+        if (!entry.variantId) renderQtyRow(key);
+      });
     }
 
     document.getElementById('search-input').addEventListener('input', (e) => {
@@ -546,13 +589,33 @@
       return d.innerHTML;
     }
 
-    window.addToCart = function(productId) {
+    window.addToCart = function(productId, variantId) {
       const product = window._products[productId];
-      const available = Number(product.quantity) || 0;
+      let entryProduct = product;
+      let key = productId;
+
+      if (variantId) {
+        const variant = (window._variants[productId] || []).find(v => v.id === variantId);
+        if (!variant) return;
+        // A synthetic product-shaped view of the chosen variant — every
+        // other cart function (cart bar total, checkout item list,
+        // stock capping) already reads entry.product.name/selling_price/
+        // quantity generically, so building this once here means none
+        // of that code needs to know variants exist at all.
+        entryProduct = {
+          local_id: productId,
+          name: `${product.name} (${variantLabel(variant.option_values)})`,
+          selling_price: Number(variant.selling_price ?? product.selling_price) || 0,
+          quantity: Number(variant.quantity) || 0,
+        };
+        key = variantId;
+      }
+
+      const available = Number(entryProduct.quantity) || 0;
       if (available <= 0) return;
-      if (!cart[productId]) cart[productId] = { product, quantity: 0 };
-      if (cart[productId].quantity < available) cart[productId].quantity += 1;
-      renderQtyRow(productId);
+      if (!cart[key]) cart[key] = { product: entryProduct, quantity: 0, productId, variantId: variantId || null };
+      if (cart[key].quantity < available) cart[key].quantity += 1;
+      renderQtyRow(key);
       renderCartBar();
     };
 
@@ -848,9 +911,10 @@
       }
 
       const bizId = path.split('/shop/')[1];
-      const items = Object.entries(cart).map(([productId, entry]) => ({
-        product_id: productId,
+      const items = Object.values(cart).map(entry => ({
+        product_id: entry.productId,
         quantity: entry.quantity,
+        variant_id: entry.variantId || undefined,
       }));
 
       const confirmBtn = document.getElementById('paynow-confirm');
@@ -913,10 +977,10 @@
     function openProductDetail(productId) {
       const p = allProducts.find(x => x.local_id === productId);
       if (!p) return;
-      const inStock = p.quantity > 0;
-      const stockText = !inStock ? 'Out of stock'
-        : `${p.quantity} unit${p.quantity === 1 ? '' : 's'} available`;
-      document.getElementById('detail-content').innerHTML = `
+      const variantList = (window._variants && window._variants[productId]) || [];
+      const isVariant = !!p.has_variants && variantList.length > 0;
+
+      const baseHtml = `
         <div class="product-img">${p.image_url
           ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}">`
           : categoryIcon(p.category)}</div>
@@ -927,6 +991,19 @@
             <label>About this product</label>
             ${escapeHtml(p.description)}
           </div>` : ''}
+      `;
+
+      if (isVariant) {
+        document.getElementById('detail-content').innerHTML = baseHtml + renderVariantPicker(p, variantList);
+        wireVariantPicker(p, variantList);
+        document.getElementById('detail-modal').classList.add('visible');
+        return;
+      }
+
+      const inStock = p.quantity > 0;
+      const stockText = !inStock ? 'Out of stock'
+        : `${p.quantity} unit${p.quantity === 1 ? '' : 's'} available`;
+      document.getElementById('detail-content').innerHTML = baseHtml + `
         ${window._showPrices ? `
           <div class="detail-section">
             <label>Price</label>
@@ -943,6 +1020,97 @@
           : `<button class="add-btn" disabled>Sold Out</button>`}
       `;
       document.getElementById('detail-modal').classList.add('visible');
+    }
+
+    // Builds one <select> per distinct option key (e.g. Size, Color)
+    // found across a product's variants — values deduped, in
+    // first-seen order. Selecting a value for every key resolves to
+    // exactly one variant (or none, if that combination isn't sold).
+    function renderVariantPicker(p, variantList) {
+      const keys = Object.keys(variantList[0].option_values || {});
+      const valuesFor = (key) => [...new Set(variantList.map(v => v.option_values[key]).filter(Boolean))];
+
+      const selects = keys.map(key => `
+        <div class="field">
+          <label>${escapeHtml(key)}</label>
+          <select id="variant-opt-${key}" onchange="onVariantOptionChange('${p.local_id}')">
+            <option value="">Select ${escapeHtml(key)}</option>
+            ${valuesFor(key).map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('')}
+          </select>
+        </div>
+      `).join('');
+
+      return `
+        ${selects}
+        <div id="variant-resolved"></div>
+      `;
+    }
+
+    function wireVariantPicker(p, variantList) {
+      window._variantOptionKeys = Object.keys(variantList[0].option_values || {});
+      renderResolvedVariant(p, variantList);
+    }
+
+    // Reads whatever's currently selected in each dropdown and finds
+    // the one variant (if any) matching all of them exactly.
+    window.onVariantOptionChange = function(productId) {
+      const p = allProducts.find(x => x.local_id === productId);
+      const variantList = window._variants[productId] || [];
+      renderResolvedVariant(p, variantList);
+    };
+
+    function currentVariantSelection() {
+      const selection = {};
+      for (const key of window._variantOptionKeys || []) {
+        const el = document.getElementById(`variant-opt-${key}`);
+        if (el) selection[key] = el.value;
+      }
+      return selection;
+    }
+
+    function findMatchingVariant(variantList, selection) {
+      const keys = Object.keys(selection);
+      if (keys.some(k => !selection[k])) return null; // not every option picked yet
+      return variantList.find(v =>
+        keys.every(k => v.option_values[k] === selection[k])) || null;
+    }
+
+    function renderResolvedVariant(p, variantList) {
+      const selection = currentVariantSelection();
+      const variant = findMatchingVariant(variantList, selection);
+      const el = document.getElementById('variant-resolved');
+      if (!el) return;
+
+      if (!variant) {
+        const allPicked = Object.values(selection).every(v => v);
+        el.innerHTML = allPicked
+          ? `<div class="detail-section" style="color:#F85149;">This combination isn't available.</div>`
+          : '';
+        return;
+      }
+
+      const price = Number(variant.selling_price ?? p.selling_price) || 0;
+      const qty = Number(variant.quantity) || 0;
+      const inStock = qty > 0;
+      const stockText = !inStock ? 'Out of stock' : `${qty} unit${qty === 1 ? '' : 's'} available`;
+      const inCart = cart[variant.id]?.quantity || 0;
+
+      el.innerHTML = `
+        ${window._showPrices ? `
+          <div class="detail-section">
+            <label>Price</label>
+            <div class="detail-price">${formatNaira(price)}</div>
+          </div>` : ''}
+        <div class="detail-stock ${inStock ? 'in-stock' : 'out-of-stock'}">
+          ${inStock
+            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>`
+            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`}
+          <span>${stockText}${inCart > 0 ? ` · ${inCart} in cart` : ''}</span>
+        </div>
+        ${inStock
+          ? `<button class="add-btn" onclick="addToCart('${p.local_id}', '${variant.id}'); document.getElementById('detail-modal').classList.remove('visible');">Add to Cart</button>`
+          : `<button class="add-btn" disabled>Sold Out</button>`}
+      `;
     }
     document.getElementById('detail-close').addEventListener('click', () => {
       document.getElementById('detail-modal').classList.remove('visible');
@@ -966,9 +1134,10 @@
       }
 
       const bizId = path.split('/shop/')[1];
-      const items = Object.entries(cart).map(([productId, entry]) => ({
-        product_id: productId,
+      const items = Object.values(cart).map(entry => ({
+        product_id: entry.productId,
         quantity: entry.quantity,
+        variant_id: entry.variantId || undefined,
       }));
 
       const confirmBtn = document.getElementById('modal-confirm');
