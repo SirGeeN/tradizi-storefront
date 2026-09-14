@@ -1141,13 +1141,30 @@
           ${inStock
             ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>`
             : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`}
-          <span>${stockText}${inCart > 0 ? ` · ${inCart} in cart` : ''}</span>
+          <span>${stockText}</span>
         </div>
-        ${inStock
-          ? `<button class="add-btn" onclick="addToCart('${p.local_id}', '${variant.id}'); document.getElementById('detail-modal').classList.remove('visible');">Add to Cart</button>`
-          : `<button class="add-btn" disabled>Sold Out</button>`}
+        ${inCart > 0
+          ? `<div class="qty-row" style="justify-content:flex-start;">
+               <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', -1)">−</button>
+               <span class="qty-value">${inCart}</span>
+               <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', 1)">+</button>
+             </div>`
+          : (inStock
+              ? `<button class="add-btn" onclick="addToCart('${p.local_id}', '${variant.id}')">Add to Cart</button>`
+              : `<button class="add-btn" disabled>Sold Out</button>`)}
       `;
     }
+
+    // Re-renders the modal's resolved-variant block after a +/- tap,
+    // same "reuse changeQty, then refresh whatever view is showing
+    // the count" pattern changeQtyInModal already uses for the
+    // checkout review list.
+    window.changeQtyInVariantModal = function(productId, variantId, delta) {
+      window.changeQty(variantId, delta);
+      const p = allProducts.find(x => x.local_id === productId);
+      const variantList = window._variants[productId] || [];
+      renderResolvedVariant(p, variantList);
+    };
     document.getElementById('detail-close').addEventListener('click', () => {
       document.getElementById('detail-modal').classList.remove('visible');
     });
