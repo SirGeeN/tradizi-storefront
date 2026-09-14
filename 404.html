@@ -149,6 +149,10 @@
     }
     .btn-whatsapp { background: #21262D; color: #C9D1D9; border: 1px solid #30363D; }
     .btn-paynow { background: #1E7A4F; color: #fff; font-weight: 800; }
+    .cart-actions-btn {
+      padding: 10px 18px; border-radius: 10px; border: none;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
 
     .empty-state { text-align: center; padding: 60px 20px; color: #6B7280; }
 
@@ -1144,16 +1148,33 @@
           <span>${stockText}</span>
         </div>
         ${inCart > 0
-          ? `<div class="qty-row" style="justify-content:flex-start;">
-               <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', -1)">−</button>
-               <span class="qty-value">${inCart}</span>
-               <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', 1)">+</button>
+          ? `<div class="qty-row" style="justify-content:space-between;">
+               <div style="display:flex; align-items:center; gap:12px;">
+                 <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', -1)">−</button>
+                 <span class="qty-value">${inCart}</span>
+                 <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', 1)">+</button>
+               </div>
+               <div style="display:flex; gap:8px;">
+                 <button class="cart-actions-btn" style="background:#21262D; color:#C9D1D9; border:1px solid #30363D;"
+                   onclick="cancelVariantSelection('${variant.id}')">Cancel</button>
+                 <button class="cart-actions-btn" style="background:#1E7A4F; color:#fff;"
+                   onclick="document.getElementById('detail-modal').classList.remove('visible');">Done</button>
+               </div>
              </div>`
           : (inStock
               ? `<button class="add-btn" onclick="addToCartFromModal('${p.local_id}', '${variant.id}')">Add to Cart</button>`
               : `<button class="add-btn" disabled>Sold Out</button>`)}
       `;
     }
+
+    // Cancel removes this variant from the cart entirely (not just a
+    // -1 tap) and closes the modal — an explicit "never mind" distinct
+    // from Done, which keeps whatever quantity is currently set.
+    window.cancelVariantSelection = function(variantId) {
+      delete cart[variantId];
+      renderCartBar();
+      document.getElementById('detail-modal').classList.remove('visible');
+    };
 
     // The grid's plain "Add" button relies on addToCart() also calling
     // renderQtyRow() for its own DOM row — but the modal's resolved-
