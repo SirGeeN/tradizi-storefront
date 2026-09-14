@@ -1150,10 +1150,22 @@
                <button class="qty-btn" onclick="changeQtyInVariantModal('${p.local_id}', '${variant.id}', 1)">+</button>
              </div>`
           : (inStock
-              ? `<button class="add-btn" onclick="addToCart('${p.local_id}', '${variant.id}')">Add to Cart</button>`
+              ? `<button class="add-btn" onclick="addToCartFromModal('${p.local_id}', '${variant.id}')">Add to Cart</button>`
               : `<button class="add-btn" disabled>Sold Out</button>`)}
       `;
     }
+
+    // The grid's plain "Add" button relies on addToCart() also calling
+    // renderQtyRow() for its own DOM row — but the modal's resolved-
+    // variant block isn't that row, so it never got refreshed on the
+    // FIRST add (only +/- taps did, via changeQtyInVariantModal). This
+    // is what let repeated clicks silently stack with no visible change.
+    window.addToCartFromModal = function(productId, variantId) {
+      window.addToCart(productId, variantId);
+      const p = allProducts.find(x => x.local_id === productId);
+      const variantList = window._variants[productId] || [];
+      renderResolvedVariant(p, variantList);
+    };
 
     // Re-renders the modal's resolved-variant block after a +/- tap,
     // same "reuse changeQty, then refresh whatever view is showing
