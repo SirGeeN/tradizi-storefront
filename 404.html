@@ -158,8 +158,8 @@
 
     /* ── Add-to-cart toast ── */
     .toast {
-      position: fixed; left: 50%; top: 16px;
-      transform: translate(-50%, -12px);
+      position: fixed; left: 50%; bottom: 90px;
+      transform: translate(-50%, 12px);
       background: #1E7A4F; color: #fff;
       padding: 12px 20px; border-radius: 12px;
       font-size: 13px; font-weight: 700;
@@ -633,7 +633,7 @@
       return d.innerHTML;
     }
 
-    window.addToCart = function(productId, variantId) {
+    window.addToCart = function(productId, variantId, notify = true) {
       const product = window._products[productId];
       let entryProduct = product;
       let key = productId;
@@ -661,7 +661,11 @@
       if (cart[key].quantity < available) cart[key].quantity += 1;
       renderQtyRow(key);
       renderCartBar();
-      showToast(`Added ${entryProduct.name}`);
+      // Plain products have no separate confirm step, so the toast
+      // fires immediately. Variant adds go through the modal's Done
+      // button instead (see addToCartFromModal/confirmVariantDone) —
+      // notify:false here avoids firing it twice.
+      if (notify) showToast(`Added ${entryProduct.name}`);
     };
 
     window.changeQty = function(productId, delta) {
@@ -1163,7 +1167,7 @@
                  <button class="cart-actions-btn" style="background:#21262D; color:#C9D1D9; border:1px solid #30363D;"
                    onclick="cancelVariantSelection('${variant.id}')">Cancel</button>
                  <button class="cart-actions-btn" style="background:#1E7A4F; color:#fff;"
-                   onclick="document.getElementById('detail-modal').classList.remove('visible');">Done</button>
+                   onclick="confirmVariantDone('${p.local_id}', '${variant.id}')">Done</button>
                </div>
              </div>`
           : (inStock
@@ -1181,13 +1185,24 @@
       document.getElementById('detail-modal').classList.remove('visible');
     };
 
+    // The toast for a variant add fires here, on Done, rather than on
+    // the initial Add to Cart tap — the customer is still actively
+    // adjusting quantity at that point, so confirming only once
+    // they've actually finished with this item matches how Cancel
+    // works too (both are end-of-flow actions, not per-tap ones).
+    window.confirmVariantDone = function(productId, variantId) {
+      const entry = cart[variantId];
+      if (entry) showToast(`Added ${entry.product.name}`);
+      document.getElementById('detail-modal').classList.remove('visible');
+    };
+
     // The grid's plain "Add" button relies on addToCart() also calling
     // renderQtyRow() for its own DOM row — but the modal's resolved-
     // variant block isn't that row, so it never got refreshed on the
     // FIRST add (only +/- taps did, via changeQtyInVariantModal). This
     // is what let repeated clicks silently stack with no visible change.
     window.addToCartFromModal = function(productId, variantId) {
-      window.addToCart(productId, variantId);
+      window.addToCart(productId, variantId, false);
       const p = allProducts.find(x => x.local_id === productId);
       const variantList = window._variants[productId] || [];
       renderResolvedVariant(p, variantList);
