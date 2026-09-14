@@ -152,6 +152,21 @@
 
     .empty-state { text-align: center; padding: 60px 20px; color: #6B7280; }
 
+    /* ── Add-to-cart toast ── */
+    .toast {
+      position: fixed; left: 50%; bottom: 90px;
+      transform: translate(-50%, 12px);
+      background: #1E7A4F; color: #fff;
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      white-space: nowrap;
+    }
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
     /* ── Order confirmation modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
@@ -261,6 +276,11 @@
 
     <div class="products" id="product-grid"></div>
     <div class="empty-state" id="empty-products" style="display:none">No products available right now.</div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+    <span id="toast-text">Added to cart</span>
   </div>
 
   <div class="cart-bar" id="cart-bar">
@@ -380,6 +400,15 @@
 
     function formatNaira(amount) {
       return '₦' + Number(amount).toLocaleString('en-NG');
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      const el = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = message;
+      el.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('visible'), 1600);
     }
 
     // Matches ProductVariant.label in product_variant_models.dart and
@@ -617,6 +646,7 @@
       if (cart[key].quantity < available) cart[key].quantity += 1;
       renderQtyRow(key);
       renderCartBar();
+      showToast(`Added ${entryProduct.name}`);
     };
 
     window.changeQty = function(productId, delta) {
