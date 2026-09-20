@@ -338,8 +338,9 @@
         <div style="font-size:12px;color:#C9D1D9;margin-top:6px;">Your receipt will be sent here.</div>
       </div>
       <div class="field">
-        <label>WhatsApp Number (optional)</label>
+        <label>Phone Number *</label>
         <input type="tel" id="paynow-phone" placeholder="e.g. 08012345678">
+        <div style="font-size:12px;color:#C9D1D9;margin-top:6px;">The dispatch rider will use this to reach you during delivery.</div>
       </div>
       <div class="field">
         <label>Delivery Address *</label>
@@ -433,6 +434,15 @@
       return Object.entries(optionValues || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
     }
 
+    // Matches _productPrice's exact resolution in
+    // customer_storefront_screen.dart and _inventoryPrice's in
+    // new_sale_tab.dart — when packaging is enabled, the customer
+    // buys by the package (bag/carton/etc), not the individual unit.
+    function productPrice(p) {
+      if (p.packaging_type && p.package_selling_price != null) return Number(p.package_selling_price) || 0;
+      return Number(p.selling_price) || 0;
+    }
+
     function show(id) {
       document.getElementById(id).style.display = id === 'storefront' ? 'block' : 'flex';
     }
@@ -473,7 +483,7 @@
       const [businesses, storefronts, products, variants] = await Promise.all([
         sbFetch('businesses', `?local_id=eq.${bizId}&select=local_id,business_name,phone`),
         sbFetch('storefront_settings', `?business_id=eq.${bizId}&select=is_public,show_prices,disabled_product_ids`),
-        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category,image_url,has_variants`),
+        sbFetch('products', `?business_id=eq.${bizId}&is_deleted=eq.false&select=local_id,name,selling_price,description,quantity,category,image_url,has_variants,packaging_type,units_per_package,package_selling_price`),
         sbFetch('product_variants', `?business_id=eq.${bizId}&is_deleted=eq.false&select=id,product_id,option_values,sku,quantity,buying_price,selling_price,image_url`),
       ]);
 
@@ -577,7 +587,7 @@
           : Number(p.quantity) || 0;
         const minPrice = isVariant
           ? Math.min(...variantList.map(v => Number(v.selling_price ?? p.selling_price) || 0))
-          : Number(p.selling_price) || 0;
+          : productPrice(p);
 
         const inStock = totalQty > 0;
         const stockLabel = !inStock
@@ -635,7 +645,13 @@
 
     window.addToCart = function(productId, variantId, notify = true) {
       const product = window._products[productId];
-      let entryProduct = product;
+      // Same "synthetic product-shaped view" pattern as the variant
+      // branch below — every downstream cart function (bar total,
+      // checkout list, stock capping) reads entry.product.selling_price
+      // generically, so overriding it here (package price when
+      // packaging is enabled) means none of that code needs its own
+      // packaging-awareness.
+      let entryProduct = { ...product, selling_price: productPrice(product) };
       let key = productId;
 
       if (variantId) {
@@ -953,6 +969,11 @@
         errorEl.style.display = 'block';
         return;
       }
+      if (!phone) {
+        errorEl.textContent = 'Please enter your phone number — the dispatch rider will need it during delivery.';
+        errorEl.style.display = 'block';
+        return;
+      }
       if (!address) {
         errorEl.textContent = 'Please enter your delivery address.';
         errorEl.style.display = 'block';
@@ -1056,7 +1077,8 @@
         ${window._showPrices ? `
           <div class="detail-section">
             <label>Price</label>
-            <div class="detail-price">${formatNaira(p.selling_price)}</div>
+            <div class="detail-price">${formatNaira(productPrice(p))}</div>
+            ${p.packaging_type ? `<div style="font-size:12px;color:#8B949E;margin-top:4px;">per ${escapeHtml(p.packaging_type)}${p.units_per_package > 1 ? ` (${p.units_per_package} units)` : ''}</div>` : ''}
           </div>` : ''}
         <div class="detail-stock ${inStock ? 'in-stock' : 'out-of-stock'}">
           ${inStock
