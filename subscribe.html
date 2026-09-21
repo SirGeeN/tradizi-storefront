@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Subscribe — TRADIZI</title>
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+
+<style>
+:root{
+  --bg:#071018;
+  --card:#101b27;
+  --card2:#132232;
+  --primary:#1E7A4F;
+  --primary2:#2fb16f;
+  --text:#f5f7fa;
+  --muted:#9fb0c0;
+  --border:rgba(255,255,255,0.08);
+  --error:#F85149;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  min-height:100vh;
+}
+a{text-decoration:none;color:inherit;}
+.container{width:min(92%,520px);margin:0 auto;padding:40px 0 60px;}
+
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.15rem;margin-bottom:32px;}
+.logo-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--primary),#123d2a);font-size:22px;}
+
+h1{font-size:1.7rem;font-weight:800;margin-bottom:6px;}
+.subtitle{color:var(--muted);margin-bottom:32px;font-size:0.95rem;}
+
+.card{background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px;}
+
+label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:10px;font-weight:600;}
+
+.tier-toggle, .period-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.period-grid{grid-template-columns:repeat(2,1fr);}
+.option-btn{
+  padding:14px 12px;border-radius:12px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,0.03);color:var(--text);cursor:pointer;
+  font-family:inherit;font-size:0.95rem;font-weight:700;text-align:center;
+  transition:all 0.15s;
+}
+.option-btn.selected{
+  border-color:var(--primary2);background:rgba(47,177,111,0.15);color:var(--primary2);
+}
+.option-btn .price{display:block;font-size:0.78rem;font-weight:500;color:var(--muted);margin-top:4px;}
+.option-btn.selected .price{color:var(--primary2);}
+
+input[type="text"]{
+  width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,0.03);color:var(--text);font-size:1rem;font-family:inherit;
+  margin-bottom:20px;
+}
+input[type="text"]:focus{outline:none;border-color:var(--primary2);}
+
+.total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 0;border-top:1px solid var(--border);margin-bottom:20px;
+}
+.total-row .label{color:var(--muted);font-size:0.9rem;}
+.total-row .amount{font-size:1.5rem;font-weight:800;color:var(--primary2);}
+
+.pay-btn{
+  width:100%;padding:16px;border-radius:14px;border:none;
+  background:var(--primary);color:white;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:background 0.15s;
+}
+.pay-btn:hover:not(:disabled){background:var(--primary2);}
+.pay-btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+.error-msg{
+  color:var(--error);font-size:0.88rem;margin-bottom:16px;display:none;
+  background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);
+  padding:12px 14px;border-radius:10px;
+}
+
+.status-screen{text-align:center;padding:60px 20px;}
+.status-icon{font-size:56px;margin-bottom:20px;}
+.status-screen h2{font-size:1.4rem;margin-bottom:12px;}
+.status-screen p{color:var(--muted);max-width:400px;margin:0 auto;}
+
+.back-link{display:inline-block;margin-top:24px;color:var(--muted);font-size:0.9rem;}
+.back-link:hover{color:var(--primary2);}
+
+#loading{text-align:center;padding:60px 20px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">🏪</div>
+    <span>TRADIZI</span>
+  </a>
+
+  <div id="loading">Loading plans…</div>
+
+  <div id="form-view" style="display:none;">
+    <h1>Subscribe to TRADIZI</h1>
+    <p class="subtitle">Upgrade your account instantly — activation happens automatically the moment payment is confirmed.</p>
+
+    <div class="card">
+      <label>Choose a plan</label>
+      <div class="tier-toggle">
+        <button type="button" class="option-btn" data-tier="pro" onclick="selectTier('pro')">Pro</button>
+        <button type="button" class="option-btn" data-tier="business" onclick="selectTier('business')">Business</button>
+      </div>
+
+      <label>Billing period</label>
+      <div class="period-grid" id="period-grid"></div>
+
+      <label>Your registered email or phone number</label>
+      <input type="text" id="identifier" placeholder="e.g. you@business.com or 08012345678">
+
+      <div class="error-msg" id="error-msg"></div>
+
+      <div class="total-row">
+        <span class="label">Total</span>
+        <span class="amount" id="total-amount">₦0</span>
+      </div>
+
+      <button class="pay-btn" id="pay-btn" onclick="submitPayment()">Pay Now</button>
+    </div>
+
+    <p style="color:var(--muted);font-size:0.82rem;text-align:center;">
+      Don't have a TRADIZI account yet? <a href="https://play.google.com/store/apps/details?id=app.tradeeasy.ng" style="color:var(--primary2);">Download the app</a> and register first.
+    </p>
+  </div>
+
+  <div id="status-view" class="status-screen" style="display:none;"></div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://yidlvvgeywnfmficuzys.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI';
+  const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-subscription-payment`;
+
+  const PERIOD_LABELS = { monthly: 'Monthly', quarterly: 'Quarterly', biannual: 'Biannual', yearly: 'Yearly' };
+
+  let prices = {}; // { pro: {monthly: 2500, ...}, business: {...} }
+  let selectedTier = null;
+  let selectedPeriod = null;
+
+  async function sbFetch(path, params = '') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}${params}`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
+  function formatNaira(amount) {
+    return '₦' + Number(amount).toLocaleString('en-NG');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('error-msg').style.display = 'none';
+  }
+
+  function showStatus(icon, title, message, showBackLink = true) {
+    document.getElementById('form-view').style.display = 'none';
+    document.getElementById('status-view').style.display = 'block';
+    document.getElementById('status-view').innerHTML = `
+      <div class="status-icon">${icon}</div>
+      <h2>${title}</h2>
+      <p>${message}</p>
+      ${showBackLink ? '<a href="index.html" class="back-link">← Back to homepage</a>' : ''}
+    `;
+  }
+
+  function renderPeriodGrid() {
+    const grid = document.getElementById('period-grid');
+    if (!selectedTier || !prices[selectedTier]) { grid.innerHTML = ''; return; }
+    grid.innerHTML = Object.entries(PERIOD_LABELS).map(([key, label]) => {
+      const price = prices[selectedTier][key];
+      if (price == null) return '';
+      return `
+        <button type="button" class="option-btn${selectedPeriod === key ? ' selected' : ''}"
+          data-period="${key}" onclick="selectPeriod('${key}')">
+          ${label}
+          <span class="price">${formatNaira(price)}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function updateTotal() {
+    const total = (selectedTier && selectedPeriod && prices[selectedTier]?.[selectedPeriod]) || 0;
+    document.getElementById('total-amount').textContent = formatNaira(total);
+  }
+
+  window.selectTier = function(tier) {
+    selectedTier = tier;
+    selectedPeriod = null;
+    document.querySelectorAll('[data-tier]').forEach(btn =>
+      btn.classList.toggle('selected', btn.dataset.tier === tier));
+    renderPeriodGrid();
+    updateTotal();
+  };
+
+  window.selectPeriod = function(period) {
+    selectedPeriod = period;
+    document.querySelectorAll('[data-period]').forEach(btn =>
+      btn.classList.toggle('selected', btn.dataset.period === period));
+    updateTotal();
+  };
+
+  window.submitPayment = async function() {
+    hideError();
+    const identifier = document.getElementById('identifier').value.trim();
+
+    if (!selectedTier) { showError('Please choose a plan.'); return; }
+    if (!selectedPeriod) { showError('Please choose a billing period.'); return; }
+    if (!identifier) { showError('Please enter your registered email or phone number.'); return; }
+
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = true;
+    btn.textContent = 'Please wait…';
+
+    try {
+      const res = await fetch(EDGE_FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, tier: selectedTier, period: selectedPeriod }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showError(data.error || 'Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Pay Now';
+        return;
+      }
+      // Paystack's own hosted checkout — leaving this page entirely.
+      window.location.href = data.authorization_url;
+    } catch (e) {
+      showError('Network error — please check your connection and try again.');
+      btn.disabled = false;
+      btn.textContent = 'Pay Now';
+    }
+  };
+
+  async function init() {
+    // Returning from Paystack's checkout (callback_url includes ?ref=).
+    // Activation itself happens server-side via the webhook, which can
+    // take a few seconds — this is informational, not authoritative;
+    // never claim the tier is active here, since that hasn't actually
+    // been confirmed at this point.
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      showStatus('✅', 'Payment received',
+        'Your subscription is being activated — this usually takes just a few seconds. Reopen the TRADIZI app to see your updated plan.');
+      return;
+    }
+
+    const rows = await sbFetch('app_config',
+      '?key=in.(price_pro_monthly,price_pro_quarterly,price_pro_biannual,price_pro_yearly,' +
+      'price_business_monthly,price_business_quarterly,price_business_biannual,price_business_yearly)');
+
+    if (!rows || rows.length === 0) {
+      document.getElementById('loading').textContent = 'Could not load pricing right now. Please try again shortly.';
+      return;
+    }
+
+    prices = { pro: {}, business: {} };
+    for (const row of rows) {
+      const match = row.key.match(/^price_(pro|business)_(\w+)$/);
+      if (!match) continue;
+      prices[match[1]][match[2]] = Number(row.value) || 0;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-view').style.display = 'block';
+
+    // Pre-select tier from ?tier=pro / ?tier=business, matching the
+    // Subscribe buttons on index.html's pricing cards.
+    const preselectTier = params.get('tier');
+    if (preselectTier === 'pro' || preselectTier === 'business') {
+      selectTier(preselectTier);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
