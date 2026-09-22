@@ -44,7 +44,10 @@ h1{font-size:2rem;font-weight:800;margin-bottom:10px;}
 .hero p{color:var(--muted);font-size:1.05rem;max-width:600px;}
 
 .layout{display:grid;grid-template-columns:220px 1fr;gap:36px;align-items:start;}
-@media (max-width:800px){.layout{grid-template-columns:1fr;}}
+@media (max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .toc{position:static;margin-bottom:24px;}
+}
 
 .toc{position:sticky;top:90px;}
 .toc h3{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:14px;}
