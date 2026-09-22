@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Help & Getting Started — TRADIZI</title>
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+
+<style>
+:root{
+  --bg:#071018;
+  --card:#101b27;
+  --card2:#132232;
+  --primary:#1E7A4F;
+  --primary2:#2fb16f;
+  --text:#f5f7fa;
+  --muted:#9fb0c0;
+  --border:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.65;
+}
+a{color:var(--primary2);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.top-nav{
+  position:sticky;top:0;z-index:10;
+  background:rgba(7,16,24,0.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:16px 0;
+}
+.top-nav .wrap{width:min(92%,1000px);margin:0 auto;display:flex;align-items:center;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;}
+.logo-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--primary),#123d2a);font-size:18px;}
+
+.container{width:min(92%,1000px);margin:0 auto;padding:40px 0 80px;}
+.hero{margin-bottom:36px;}
+h1{font-size:2rem;font-weight:800;margin-bottom:10px;}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:600px;}
+
+.layout{display:grid;grid-template-columns:220px 1fr;gap:36px;align-items:start;}
+@media (max-width:800px){.layout{grid-template-columns:1fr;}}
+
+.toc{position:sticky;top:90px;}
+.toc h3{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:14px;}
+.toc a{display:block;padding:8px 0;color:var(--text);font-size:0.92rem;border-left:2px solid transparent;padding-left:12px;}
+.toc a:hover{color:var(--primary2);text-decoration:none;border-left-color:var(--primary2);}
+
+.section{
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid var(--border);border-radius:18px;
+  padding:28px;margin-bottom:20px;scroll-margin-top:90px;
+}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.section-num{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:rgba(47,177,111,0.15);color:var(--primary2);
+  display:grid;place-items:center;font-weight:800;font-size:1rem;
+}
+.section h2{font-size:1.25rem;font-weight:800;}
+.section .lead{color:var(--muted);margin-bottom:18px;font-size:0.95rem;}
+
+.steps{counter-reset:step;list-style:none;}
+.steps li{
+  counter-increment:step;position:relative;padding-left:40px;margin-bottom:16px;
+  font-size:0.95rem;
+}
+.steps li::before{
+  content:counter(step);position:absolute;left:0;top:0;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border);
+  display:grid;place-items:center;font-size:0.8rem;font-weight:700;color:var(--primary2);
+}
+.steps b{color:var(--text);}
+
+.path{
+  display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  padding:6px 12px;border-radius:8px;font-size:0.85rem;color:var(--muted);
+  margin:6px 0 14px;
+}
+.path b{color:var(--primary2);font-weight:600;}
+
+.tip{
+  background:rgba(47,177,111,0.08);border:1px solid rgba(47,177,111,0.25);
+  border-radius:10px;padding:12px 14px;font-size:0.88rem;color:var(--muted);
+  margin-top:14px;
+}
+.tip b{color:var(--primary2);}
+
+.warn{
+  background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.25);
+  border-radius:10px;padding:12px 14px;font-size:0.88rem;color:var(--muted);
+  margin-top:14px;
+}
+.warn b{color:#F85149;}
+
+.role-tag{
+  display:inline-block;font-size:0.72rem;font-weight:700;
+  padding:3px 9px;border-radius:20px;
+  background:rgba(255,255,255,0.08);color:var(--muted);
+  margin-bottom:14px;
+}
+
+.contact-card{
+  text-align:center;padding:40px 28px;margin-top:8px;
+  background:linear-gradient(135deg,rgba(47,177,111,0.12),rgba(18,61,42,0.3));
+  border:1px solid rgba(47,177,111,0.3);border-radius:18px;
+}
+.contact-card h3{font-size:1.2rem;margin-bottom:8px;}
+.contact-card p{color:var(--muted);margin-bottom:20px;font-size:0.95rem;}
+.btn{
+  display:inline-block;padding:13px 26px;border-radius:12px;
+  background:var(--primary);color:white;font-weight:700;font-size:0.95rem;
+}
+.btn:hover{background:var(--primary2);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🏪</div>
+      <span>TRADIZI</span>
+    </a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>Help & Getting Started</h1>
+    <p>Everything you need to set up and run your business on TRADIZI — step by step, no guesswork.</p>
+  </div>
+
+  <div class="layout">
+    <nav class="toc">
+      <h3>On this page</h3>
+      <a href="#register">1. Register</a>
+      <a href="#products">2. Add products</a>
+      <a href="#sales">3. Record a sale</a>
+      <a href="#store">4. Online store</a>
+      <a href="#payout">5. Payout account</a>
+      <a href="#delivery">6. Delivery zones</a>
+      <a href="#staff">7. Staff & permissions</a>
+      <a href="#expenses">8. Record expenses</a>
+      <a href="#credit">9. Track customer credit</a>
+      <a href="#reports">10. Reports</a>
+      <a href="#notifications">11. Notifications</a>
+      <a href="#subscribe">12. Upgrading your plan</a>
+      <a href="#contact">Still stuck?</a>
+    </nav>
+
+    <div>
+
+      <!-- 1. REGISTER -->
+      <section class="section" id="register">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2>Register your business</h2>
+        </div>
+        <p class="lead">Two ways to create your account — pick whichever is easiest for you.</p>
+
+        <b>Option A — Continue with Google (fastest)</b>
+        <ol class="steps">
+          <li>On the welcome screen, tap <b>Continue with Google</b>.</li>
+          <li>Choose the Google account you want to use for your business.</li>
+          <li>Enter your business name when prompted, and you're in — no password to remember.</li>
+        </ol>
+
+        <b>Option B — Phone number & PIN</b>
+        <ol class="steps">
+          <li>On the welcome screen, tap <b>Register with Phone</b>.</li>
+          <li>Enter your business name and phone number.</li>
+          <li>Create a 4-digit PIN — you'll use this to log in from now on. Choose one you won't forget; write it down somewhere safe.</li>
+          <li>Confirm your PIN and you're ready to go.</li>
+        </ol>
+
+        <div class="tip"><b>Tip:</b> If you ever move to a new phone, use the <b>same</b> Google account or phone number to log back in — all your data (products, sales, customers) will restore automatically.</div>
+      </section>
+
+      <!-- 2. PRODUCTS -->
+      <section class="section" id="products">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2>Add your products</h2>
+        </div>
+        <div class="path"><b>Inventory tab</b> → tap the <b>+</b> button</div>
+
+        <ol class="steps">
+          <li>Enter the <b>product name</b> and choose a <b>category</b>.</li>
+          <li>Enter your <b>cost price</b> (what you paid) and <b>selling price</b> (what customers pay).</li>
+          <li>Enter your <b>current stock quantity</b>.</li>
+          <li>If you sell in packages (e.g. a bag, carton, or crate of items), turn on <b>Packaging</b> and enter how many units are in one package, plus the package price.</li>
+          <li>If the same product comes in different options (e.g. sizes or colors), turn on <b>Variants</b> instead of packaging — add each size/color combination with its own stock and price.</li>
+          <li>Add a photo if you have one — this shows on your online store.</li>
+          <li>Tap <b>Save</b>. Your product now appears on the Sales screen, ready to sell.</li>
+        </ol>
+
+        <div class="warn"><b>Important:</b> Always enter a real selling price above ₦0. A product saved with no price will ask you to confirm the price again the first time you try to sell it.</div>
+      </section>
+
+      <!-- 3. RECORD A SALE -->
+      <section class="section" id="sales">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2>Record a sale</h2>
+        </div>
+        <div class="path"><b>Sales tab</b></div>
+
+        <ol class="steps">
+          <li>Tap any product to add it straight to your cart — one tap per item sold.</li>
+          <li>Need more of the same item? Tap it again, or use the <b>+</b>/<b>−</b> buttons in the cart to adjust quantity.</li>
+          <li>Selling a product you haven't added to Inventory yet? Tap <b>Sell New Item</b> at the top — this lets you record the sale immediately and adds it to your Inventory automatically.</li>
+          <li>When you're done, tap <b>Checkout</b>, choose how the customer paid (Cash, Transfer, Card, or Credit), and confirm.</li>
+          <li>A receipt is generated automatically — you can share it on WhatsApp or as a PDF straight after.</li>
+        </ol>
+
+        <div class="tip"><b>Selling on credit?</b> Choose <b>Credit</b> as the payment method and enter the customer's details — this automatically logs it as debt owed, trackable from the Credit tab (see section 9).</div>
+      </section>
+
+      <!-- 4. ONLINE STORE -->
+      <section class="section" id="store">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2>Set up your online store</h2>
+        </div>
+        <div class="path"><b>More tab</b> → <b>Online Store</b></div>
+
+        <ol class="steps">
+          <li>Turn on <b>Make My Store Public</b> — this is off by default until you enable it.</li>
+          <li>Choose whether to show prices on your storefront, or keep them hidden (customers message you to ask).</li>
+          <li>Your storefront link is generated automatically: <code>tradizi.com/shop/yourstore</code> — share this on WhatsApp status, Instagram bio, or anywhere else.</li>
+          <li>Customers can order two ways: <b>message you on WhatsApp</b> directly with their order, or <b>pay online instantly</b> (Pay Now) if you've set up a payout account (see section 5).</li>
+          <li>Any product you don't want visible online can be hidden per-product from the same screen — useful for items that are out of season or reserved.</li>
+        </ol>
+
+        <div class="tip"><b>Note:</b> Your storefront link is also included automatically on every receipt you share, so past customers can always find their way back to shop again.</div>
+      </section>
+
+      <!-- 5. PAYOUT ACCOUNT -->
+      <section class="section" id="payout">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2>Set up your payout account</h2>
+        </div>
+        <span class="role-tag">Owner only</span>
+        <div class="path"><b>More tab</b> → <b>Payout Account</b></div>
+        <p class="lead">This is what lets customers pay you instantly online through your storefront's <b>Pay Now</b> option — money goes straight to your own bank account.</p>
+
+        <ol class="steps">
+          <li>Select your <b>bank</b> from the list.</li>
+          <li>Enter your <b>account number</b>.</li>
+          <li>TRADIZI verifies the account and shows you the <b>account holder's name</b> — double-check this matches you before continuing. This step exists specifically so you never accidentally link the wrong account.</li>
+          <li>Confirm, and you're done — Pay Now is now active on your storefront.</li>
+        </ol>
+
+        <div class="warn"><b>Without this step:</b> customers can still order via WhatsApp, but the <b>Pay Now</b> instant-payment option won't be available until your payout account is set up.</div>
+      </section>
+
+      <!-- 6. DELIVERY ZONES -->
+      <section class="section" id="delivery">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2>Set up delivery zones</h2>
+        </div>
+        <span class="role-tag">Owner only</span>
+        <div class="path"><b>More tab</b> → <b>Delivery Zones</b></div>
+
+        <ol class="steps">
+          <li>Tap <b>Add Zone</b> and name it (e.g. "Mainland", "Island", "Within 5km").</li>
+          <li>Enter the delivery fee for that zone — or leave it as <b>Free</b> if you don't charge for that area.</li>
+          <li>Add as many zones as you need. Customers select their zone at checkout, and the correct fee is added automatically.</li>
+          <li>If a customer's area isn't listed, your storefront shows a note asking them to message you directly to arrange delivery.</li>
+        </ol>
+
+        <div class="tip"><b>Tip:</b> Until you add a zone, delivery is free by default for everyone — set this up early if you charge for delivery anywhere.</div>
+      </section>
+
+      <!-- 7. STAFF -->
+      <section class="section" id="staff">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2>Add staff & set permissions</h2>
+        </div>
+        <span class="role-tag">Owner only</span>
+        <div class="path"><b>More tab</b> → <b>Staff & Permissions</b></div>
+
+        <ol class="steps">
+          <li>Tap <b>Add Staff</b> and enter their name and phone number.</li>
+          <li>Choose their role: <b>Manager</b> (broad access, can see cost/profit if you allow it) or <b>Seller</b> (records sales only, no access to costs, editing, or deleting).</li>
+          <li>An invite code is generated — share this with your staff member.</li>
+          <li>They enter the code in their own TRADIZI app to join your business under their own login.</li>
+          <li>You can edit a staff member's permissions or remove their access at any time from the same screen.</li>
+        </ol>
+
+        <div class="tip"><b>Why this matters:</b> Sellers can record sales and view their own performance, but can never see your cost prices, profit margins, or delete/edit records — your numbers stay protected.</div>
+      </section>
+
+      <!-- 8. EXPENSES -->
+      <section class="section" id="expenses">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2>Record expenses</h2>
+        </div>
+        <div class="path"><b>More tab</b> → <b>Expenses</b></div>
+
+        <ol class="steps">
+          <li>Tap the <b>+</b> button.</li>
+          <li>Choose a category (Rent, Utilities, Transport, Staff Costs, Supplies, and more).</li>
+          <li>Enter the amount and a short description.</li>
+          <li>Save — this expense is now automatically deducted when calculating your <b>Profit After Expenses</b> on the Dashboard and Reports.</li>
+        </ol>
+
+        <div class="tip"><b>Two profit numbers, on purpose:</b> Your Dashboard shows both <b>Gross Profit</b> (sales minus cost of goods) and <b>Profit After Expenses</b> (Gross Profit minus everything you've logged here) — side by side, so you always see both the full picture and the real bottom line.</div>
+      </section>
+
+      <!-- 9. CREDIT / DEBT -->
+      <section class="section" id="credit">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2>Track customer credit (debt)</h2>
+        </div>
+        <div class="path"><b>Credit tab</b></div>
+
+        <ol class="steps">
+          <li>Every sale recorded as <b>Credit</b> (see section 3) automatically appears here, grouped by customer.</li>
+          <li>Tap any customer to see their full balance and payment history.</li>
+          <li>When they pay you back — in full or in part — tap <b>Collect Payment</b> and enter the amount. Their balance updates immediately.</li>
+          <li>Turn on debt reminder notifications (see section 11) to get nudged automatically about outstanding balances.</li>
+        </ol>
+      </section>
+
+      <!-- 10. REPORTS -->
+      <section class="section" id="reports">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2>Reports</h2>
+        </div>
+        <div class="path"><b>Reports tab</b></div>
+
+        <ol class="steps">
+          <li><b>Sales</b> — revenue, gross and net profit, and your top-selling products, filterable by day, week, month, or a custom date range.</li>
+          <li><b>Inventory</b> — stock levels, low-stock alerts, and inventory value at a glance.</li>
+          <li><b>Staff</b> (Owner only) — see revenue and expenses broken down per staff member, so you know exactly who sold what.</li>
+          <li>Every report can be exported as a PDF to share or keep for your own records.</li>
+        </ol>
+      </section>
+
+      <!-- 11. NOTIFICATIONS -->
+      <section class="section" id="notifications">
+        <div class="section-header">
+          <div class="section-num">11</div>
+          <h2>Notifications</h2>
+        </div>
+        <div class="path"><b>More tab</b> → <b>Notifications</b></div>
+
+        <ol class="steps">
+          <li><b>Daily Report</b> — get a summary of the day's sales and profit pushed to your phone at a time you choose.</li>
+          <li><b>Debt Reminders</b> — get reminded about customers who owe you money, so nothing slips through the cracks.</li>
+          <li>Turn either on or off, and set your preferred time for each, from this same screen.</li>
+        </ol>
+      </section>
+
+      <!-- 12. SUBSCRIBE -->
+      <section class="section" id="subscribe">
+        <div class="section-header">
+          <div class="section-num">12</div>
+          <h2>Upgrading your plan</h2>
+        </div>
+        <p class="lead">TRADIZI is free to start. Pro and Business unlock unlimited products, advanced reports, multi-device access, and more.</p>
+
+        <ol class="steps">
+          <li>From <b>More tab</b> → your plan name at the bottom of the menu shows your current plan.</li>
+          <li>To upgrade, visit <a href="subscribe.html">tradizi.com/subscribe.html</a> from any browser.</li>
+          <li>Choose Pro or Business, pick a billing period, and enter the email or phone number you registered with.</li>
+          <li>Complete payment — your account is upgraded automatically within seconds, no need to contact anyone.</li>
+        </ol>
+
+        <div class="tip"><b>Renewing early?</b> Paying again before your current plan expires simply adds the new period on top of your remaining time — you never lose days by renewing early.</div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="contact-card" id="contact">
+    <h3>Still stuck on something?</h3>
+    <p>Our team is on WhatsApp and happy to help directly.</p>
+    <a class="btn" id="whatsapp-btn" href="#">Message us on WhatsApp</a>
+  </div>
+</div>
+
+<script>
+  // Number is read from the same place the app itself reads its
+  // support contact from, so this page never needs its own hardcoded
+  // duplicate — one source of truth, kept live from app_config.
+  const SUPABASE_URL = 'https://yidlvvgeywnfmficuzys.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpZGx2dmdleXduZm1maWN1enlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDc0MDYsImV4cCI6MjA4OTY4MzQwNn0.3kNHwLySU_FT58sr2qiMEflNytSoOyo7hI9H_SVi8lI';
+
+  (async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/app_config?key=eq.upgrade_whatsapp_number&select=value`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      });
+      const rows = await res.json();
+      const phone = rows?.[0]?.value;
+      if (phone) {
+        const msg = encodeURIComponent('Hello TRADIZI Support, I need help with the app.');
+        document.getElementById('whatsapp-btn').href = `https://wa.me/${phone}?text=${msg}`;
+      }
+    } catch (e) { /* link just stays as-is if this fails — no crash */ }
+  })();
+</script>
+</body>
+</html>
